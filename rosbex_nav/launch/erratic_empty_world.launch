@@ -1,0 +1,5 @@
+<launch>
+
+    <include file="$(find erratic_description)/launch/erratic_mobile_base.launch" />
+
+</launch>
