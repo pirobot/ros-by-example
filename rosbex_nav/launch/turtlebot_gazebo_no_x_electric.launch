@@ -2,10 +2,10 @@
   <!-- start gazebo with an empty plane -->
   <param name="/use_sim_time" value="true" />
 
-  <node name="gazebo" pkg="gazebo" type="gazebo" args="-r $(find pi_nav)/worlds/empty.world" respawn="false" output="screen"/>
+  <node name="gazebo" pkg="gazebo" type="gazebo" args="-r $(find rosbex_nav)/worlds/empty.world" respawn="false" output="screen"/>
 
 
-  <include file="$(find pi_nav)/launch/turtlebot_sim.launch"/>
+  <include file="$(find rosbex_nav)/launch/turtlebot_sim.launch"/>
   
   <node pkg="tf" type="static_transform_publisher" name="odom_combined_broadcaster" args="0 0 0 0 0 0 /odom_combined /odom 100" />
   <node pkg="tf" type="static_transform_publisher" name="odom_world_broadcaster" args="0 0 0 0 0 0 /odom /world 100" />
