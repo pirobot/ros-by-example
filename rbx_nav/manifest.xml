@@ -1,5 +1,5 @@
 <package>
-  <description brief="pi_nav">
+  <description brief="rbx_nav">
 
     Demonstrating basic use of the ROS navigation control
     for a differential drive mobile robot.
