@@ -1,0 +1,17 @@
+<package>
+  <description brief="pi_video_hbrc_test">
+
+     pi_video_tracker
+
+  </description>
+  <author>Patrick Goebel</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/pi_video_tracker</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="cv_bridge"/>
+  <depend package="dynamic_reconfigure"/>
+</package>
+
+
