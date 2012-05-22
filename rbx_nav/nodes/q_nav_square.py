@@ -22,7 +22,7 @@
 """
 
 import roslib
-roslib.load_manifest('pi_nav')
+roslib.load_manifest('rbx_nav')
 
 import rospy
 from geometry_msgs.msg import Twist, Quaternion

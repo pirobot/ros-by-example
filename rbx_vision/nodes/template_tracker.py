@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 
 """ template_tracker.py - Version 1.0 2012-02-28
@@ -9,7 +9,7 @@
 """
 
 import roslib
-roslib.load_manifest('pi_video_tracker')
+roslib.load_manifest('rbx_vision')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 from sensor_msgs.msg import Image, RegionOfInterest

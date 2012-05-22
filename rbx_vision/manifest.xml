@@ -1,7 +1,7 @@
 <package>
-  <description brief="pi_video_hbrc_test">
+  <description brief="rbx_vision">
 
-     pi_video_tracker
+     rbx_vision
 
   </description>
   <author>Patrick Goebel</author>

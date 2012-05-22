@@ -21,12 +21,9 @@ if __name__ == '__main__':
         target_file = sys.argv[1]
         test_file = sys.argv[2]
     except:
-        target_file = "test_images/one_orl_face.jpg"
-        test_file = "test_images/all_orl_faces_missing_one.jpg"
+        target_file = "test_images/mona_lisa_face.png"
+        test_file = "test_images/mona_lisa.png"
         
-        #target_file = "test_images/melody_face_frontal.png"
-        #test_file = "test_images/melody_test_8.png"
-    
         print help_message
         
     try:
@@ -35,16 +32,16 @@ if __name__ == '__main__':
         n_pyr = 2
         
     # If we don't need different scales and orientations, set this to False
-    scale_and_rotate = False
+    scale_and_rotate = True
     show_all_matches = False
-    ignore_threshold = True
+    ignore_threshold = False
         
     # Match threshold
     match_threshold = 0.7
         
     # Smallest template size in pixels we will consider
-    min_template_size = 10
-    max_template_size = 200
+    min_template_size = 75
+    max_template_size = 300
     
     # What multiplier should we use between adjacent scales
     scale_factor = 1.1 # 10% increases
@@ -52,9 +49,6 @@ if __name__ == '__main__':
     # Read in the template and test image
     template = cv2.imread(target_file, cv.CV_LOAD_IMAGE_COLOR)
     image = cv2.imread(test_file, cv.CV_LOAD_IMAGE_COLOR)
-    
-    #template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
-    #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
     if scale_and_rotate:
         # Compute the min and max scales to use on the template
@@ -76,18 +70,11 @@ if __name__ == '__main__':
                 break
         
         # And a set of rotation angles
-        #rotations = [-60, -30, 0, 30, 60]
+        rotations = [-60, -30, 0, 30, 60]
         rotations = [0]
     else:
         scales = [1]
         rotations = [0]
-
-    # Add some noise to the image
-#    rng = cv.RNG(-1)
-#    noise = cv.CreateMat(image.shape[0], image.shape[1], cv.CV_8UC3)
-#    cv.RandArr(rng, noise, noise.type, 200, 2)
-#    noise_arr = np.array(noise, dtype=np.uint8)
-#    image = cv2.add(image, noise_arr)
 
     # We need a copy of the original images for later work
     template_start = template.copy()
@@ -186,30 +173,24 @@ if __name__ == '__main__':
     print "Time elapsed: ", elapsed, "ms"
 
     best_result = cv2.resize(best_result, (int(pow(2.0, n_pyr)) * best_result.shape[1], int(pow(2.0, n_pyr)) * best_result.shape[0]))
-    cv2.namedWindow("NCC", cv.CV_WINDOW_NORMAL)
-    cv2.imshow("NCC", best_result)
     best_template = cv2.resize(best_template, (int(pow(2.0, n_pyr)) * best_template.shape[1], int(pow(2.0, n_pyr)) * best_template.shape[0]))
-    cv2.imshow("Template", best_template)
-#    cv2.imshow("Template", template_start)
-#    cv2.imshow("Reduced Image", image_copy)
-#    image_copy = cv2.resize(image_copy, (int(pow(2.0, n_pyr)) * image_copy.shape[1], int(pow(2.0, n_pyr)) * image_copy.shape[0]))
-#    cv2.imshow("Reduced Image Magnified", image_copy)
-    image_copy = cv2.resize(image_copy, (int(pow(2.0, n_pyr)) * image_copy.shape[1], int(pow(2.0, n_pyr)) * image_copy.shape[0]))
+    
     # Draw a rotated ellipse around the best match location
     if show_all_matches and match_boxes:
         for match_box in match_boxes:
             cv2.ellipse(image, match_box, cv.RGB(255, 255, 50), 2)
         
     if maxScore > match_threshold or ignore_threshold:
-        #cv2.ellipse(image, best_match_box, cv.RGB(50, 255, 50), 2)
         cv2.rectangle(image, (best_x, best_y), (best_x + w, best_y + h), cv.RGB(50, 255, 50), 4)
     
+    cv2.imshow("Template", template_start)
     cv2.imshow("Test Image", image)
-
+    cv2.namedWindow("Correlation", cv.CV_WINDOW_AUTOSIZE)
+    cv2.imshow("Correlation", best_result)
     
-#    cv2.imshow("Source Image", image)
-#    cv2.imshow("PyrDown 3 Times", pyrdown_image)
-#    cv2.imshow("Magnified PyrDown", display_image)
+    cv.MoveWindow("Template", 10, 10)
+    cv.MoveWindow("Test Image", template_start.shape[1] + 20, 10)
+    cv.MoveWindow("Correlation", template_start.shape[1] + image.shape[1] + 40, 10)
     
     cv2.waitKey()
     
