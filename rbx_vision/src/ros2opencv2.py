@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" ros2opencv.py - Version 0.1 2011-04-24
+""" ros2opencv2.py - Version 0.1 2011-04-24
 
     A ROS-to-OpenCV node that uses cv_bridge to map a ROS image topic and optionally a ROS
     depth image topic to the equivalent OpenCV image stream(s).
@@ -28,17 +28,18 @@
 """
 
 import roslib
-roslib.load_manifest('pi_video_tracker')
+roslib.load_manifest('rbx_vision')
 import rospy
+import cv2
 import cv2.cv as cv
 import sys
-import os
 from std_msgs.msg import String
 from sensor_msgs.msg import Image, RegionOfInterest, CameraInfo
 from cv_bridge import CvBridge, CvBridgeError
 import time
 
-class ROS2OpenCV:
+
+class ROS2OpenCV2:
     def __init__(self, node_name):
         rospy.init_node(node_name)
         
@@ -47,6 +48,7 @@ class ROS2OpenCV:
         self.node_name = node_name
         self.show_text = rospy.get_param("~show_text", True)
         self.show_features = rospy.get_param("~show_features", True)
+        self.show_boxes = rospy.get_param("~show_boxes", True)
         self.flip_image = rospy.get_param("~flip_image", False)
 
         """ Initialize the Region of Interest and its publisher """
@@ -58,6 +60,7 @@ class ROS2OpenCV:
         self.frame_size = None
         self.depth_image = None
         self.grey = None
+        self.prev_grey = None
         self.selected_point = None
         self.selection = None
         self.drag_start = None
@@ -67,7 +70,7 @@ class ROS2OpenCV:
         self.display_box = None
         self.keep_marker_history = False
         self.night_mode = False
-        self.auto_face_tracking = True
+        self.auto_face_tracking = False
         self.cps = 0 # Cylces per second = number of processing loops per second.
         self.cps_values = list()
         self.cps_n_values = 20
@@ -75,7 +78,7 @@ class ROS2OpenCV:
 
         """ Create the display window """
         self.cv_window_name = self.node_name
-        cv.NamedWindow(self.cv_window_name, cv.CV_NORMAL)
+        cv.NamedWindow(self.cv_window_name, cv.CV_WINDOW_NORMAL)
         cv.ResizeWindow(self.cv_window_name, 640, 480)
         
         """ Create the cv_bridge object """
@@ -83,8 +86,6 @@ class ROS2OpenCV:
         
         """ Set a call back on mouse clicks on the image window """
         cv.SetMouseCallback (self.node_name, self.on_mouse_click, None)
-        
-        #time.sleep(4)
         
         """ Subscribe to the raw camera image topic and set the image processing callback """
         self.image_sub = rospy.Subscriber("input_rgb_image", Image, self.image_callback, queue_size=1)
@@ -98,8 +99,8 @@ class ROS2OpenCV:
         if not self.frame:
             return
         
-        if self.frame.origin:
-            y = self.frame.height - y
+        #if self.frame.origin:
+            #y = self.frame.height - y
             
         if event == cv.CV_EVENT_LBUTTONDOWN and not self.drag_start:
             self.features = []
@@ -110,8 +111,8 @@ class ROS2OpenCV:
             
         if event == cv.CV_EVENT_LBUTTONUP:
             self.drag_start = None
+            self.classifier_initialized = False
             self.detect_box = self.selection
-            self.track_box = self.detect_box
             
         if self.drag_start:
             xmin = max(0, min(x, self.drag_start[0]))
@@ -150,17 +151,19 @@ class ROS2OpenCV:
         """ Create a few images we will use for display """
         if not self.frame:
             self.frame_size = cv.GetSize(frame)
-            self.frame = cv.CreateImage(self.frame_size, 8, 3)
-            self.marker_image = cv.CreateImage(self.frame_size, 8, 3)
-            self.display_image = cv.CreateImage(self.frame_size, 8, 3)
-            self.processed_image = cv.CreateImage(self.frame_size, 8, 3)
-            cv.Zero(self.marker_image)
-
-        """ Copy the current frame to the global image in case we need it elsewhere"""
-        cv.Copy(frame, self.frame)
+            self.cols, self.rows = cv.GetSize(frame)
+            self.frame_type = frame.type
+            self.frame = cv.CreateMat(self.rows, self.cols, self.frame_type)
+            self.marker_image = cv.CreateMat(self.rows, self.cols, self.frame_type)
+            self.display_image = cv.CreateMat(self.rows, self.cols, self.frame_type)
+            self.processed_image = cv.CreateMat(self.rows, self.cols, self.frame_type)
+            cv.SetZero(self.marker_image)
         
+        """ Copy the current frame to the global image in case we need it elsewhere"""
+        self.frame = cv.CloneMat(frame)
+            
         if not self.keep_marker_history:
-            cv.Zero(self.marker_image)
+            cv.SetZero(self.marker_image)
         
         """ Process the image to detect and track objects or features """
         if not self.busy:
@@ -170,10 +173,10 @@ class ROS2OpenCV:
             return
         
         """ If the result is a greyscale image, convert to 3-channel for display purposes """
-        if processed_image.channels == 1:
-            cv.CvtColor(processed_image, self.processed_image, cv.CV_GRAY2BGR)
-        else:
-            cv.Copy(processed_image, self.processed_image)
+        #if processed_image.channels == 1:
+            #cv.CvtColor(processed_image, self.processed_image, cv.CV_GRAY2BGR)
+        #else:
+        self.processed_image = cv.CloneMat(processed_image)
         
         """ Display the user-selection rectangle or point."""
         self.display_markers()
@@ -181,22 +184,32 @@ class ROS2OpenCV:
         if self.night_mode:
             """ Night mode: only display the markers """
             cv.SetZero(self.processed_image)
-        
-        """ Merge the processed image and the marker image """
+            
+        """ Merge the processed image and the marker image """ 
         cv.Or(self.processed_image, self.marker_image, self.display_image)
-        
+
         if self.track_box is not None:
-            if self.auto_face_tracking:
-                cv.EllipseBox(self.display_image, self.track_box, cv.CV_RGB(255, 0, 0), 3)
-            else:
+            try:
                 (center, size, angle) = self.track_box
                 pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-                cv.Rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 2, 8, 0)
-            
+                #cv.Rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 2, 8, 0)
+                if self.show_boxes:
+                    cv.EllipseBox(self.display_image, self.track_box, cv.CV_RGB(255, 0, 0), 1)
+            except:
+                x,y,w,h = self.track_box
+                size = w, h
+                center = x + w / 2, y + h / 2
+                pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
+                pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
+                try:
+                    cv.Rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 1, 8, 0)
+                except:
+                    print pt1, pt2
         elif self.detect_box is not None:
             (pt1_x, pt1_y, w, h) = self.detect_box
-            cv.Rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(255, 0, 0), 2, 8, 0)
+            if self.show_boxes:
+                cv.Rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(255, 0, 0), 1, 8, 0)
         
         """ Handle keyboard events """
         self.keystroke = cv.WaitKey(5)
@@ -212,12 +225,20 @@ class ROS2OpenCV:
         if self.show_text:
             hscale = 0.2 * self.frame_size[0] / 160. + 0.1
             vscale = 0.2 * self.frame_size[1] / 120. + 0.1
-            voffset = int(40 + self.frame_size[1] / 120.)
             text_font = cv.InitFont(cv.CV_FONT_VECTOR0, hscale, vscale, 0, 1, 8)
             """ Print cycles per second (CPS) and resolution (RES) at top of the image """
-            cv.PutText(self.display_image, "CPS: " + str(self.cps), (10, 20), text_font, cv.RGB(255, 255, 0))
+            if self.frame_size[0] >= 640:
+                vstart = 25
+                voffset = int(50 + self.frame_size[1] / 120.)
+            elif self.frame_size[0] == 320:
+                vstart = 15
+                voffset = int(35 + self.frame_size[1] / 120.)
+            else:
+                vstart = 10
+                voffset = int(20 + self.frame_size[1] / 120.)
+            cv.PutText(self.display_image, "CPS: " + str(self.cps), (10, vstart), text_font, cv.RGB(255, 255, 0))
             cv.PutText(self.display_image, "RES: " + str(self.frame_size[0]) + "X" + str(self.frame_size[1]), (10, voffset), text_font, cv.RGB(255, 255, 0))
-
+        
         # Now display the image.
         cv.ShowImage(self.node_name, self.display_image)
         
@@ -228,6 +249,8 @@ class ROS2OpenCV:
                 self.night_mode = not self.night_mode
             elif cc == 'f':
                 self.show_features = not self.show_features
+            elif cc == 'b':
+                self.show_boxes = not self.show_boxes
             elif cc == 't':
                 self.show_text = not self.show_text
             elif cc == 'q':
@@ -236,10 +259,10 @@ class ROS2OpenCV:
           
     def convert_image(self, ros_image):
         try:
-            frame = self.bridge.imgmsg_to_cv(ros_image, "bgr8")
+            frame = cv.GetMat(self.bridge.imgmsg_to_cv(ros_image, "bgr8"))
             return frame
         except CvBridgeError, e:
-          print e
+            print e
           
     def convert_depth_image(self, ros_image):
         try:
@@ -249,15 +272,7 @@ class ROS2OpenCV:
         except CvBridgeError, e:
             print e
           
-    def process_image(self, frame):
-#        if not self.grey:
-#            """ Allocate temporary images """      
-#            self.grey = cv.CreateImage(self.frame_size, 8, 1)
-#            
-#        """ Convert color input image to grayscale """
-#        cv.CvtColor(frame, self.grey, cv.CV_BGR2GRAY)
-#        cv.EqualizeHist(self.grey, self.grey)
-        
+    def process_image(self, frame): 
         # Since we aren't applying any filters in this base class, set the ROI to the selected region, if any.
         if not self.drag_start and not self.detect_box is None:         
             self.ROI = RegionOfInterest()
@@ -286,16 +301,31 @@ class ROS2OpenCV:
     def is_rect_nonzero(self, r):
         # First assume a simple CvRect type
         try:
-            (_,_,w,h) = r
+            (_, _, w, h) = r
             return (w > 0) and (h > 0)
         except:
             # Otherwise, assume a CvBox2D type
-            ((_,_),(w,h),a) = r
-            return (w > 0) and (h > 0) 
+            ((_,_), (w,h), a) = r
+            return (w > 0) and (h > 0)
+        
+    def cvRect_to_cvBox2D(self, roi):
+        if len(roi) == 3:
+            (center, size, angle) = roi
+            pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
+            pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
+            rect = (pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1])
+        else:
+            (p1_x, p1_y, width, height) = roi
+            center = (int(p1_x + width / 2), int(p1_y + height / 2))
+            size = (width, height)
+            angle = 0
+            rect = (center, size, angle)
+            
+        return rect
         
     def cleanup(self):
         print "Shutting down vision node."
-        cv.DestroyAllWindows()       
+        cv2.destroyAllWindows()       
 
 def main(args):
     # Display a help message if appropriate.
@@ -304,13 +334,13 @@ def main(args):
     print help_message
           
     # Fire up the node.
-    ROS2OpenCV("ros2opencv")
+    ROS2OpenCV2("ros2opencv")
     
     try:
-      rospy.spin()
+        rospy.spin()
     except KeyboardInterrupt:
-      print "Shutting down ros2opencv node."
-      cv.DestroyAllWindows()
+        print "Shutting down ros2opencv node."
+        cv.DestroyAllWindows()
 
 if __name__ == '__main__':
     main(sys.argv)

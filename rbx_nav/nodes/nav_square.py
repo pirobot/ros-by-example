@@ -22,13 +22,12 @@
 """
 
 import roslib
-roslib.load_manifest('rbxs_nav')
+roslib.load_manifest('rbx_nav')
 
 import rospy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
-from time import sleep
 from math import radians, copysign, sqrt, pow, pi
 
 class NavSquare():
@@ -37,15 +36,15 @@ class NavSquare():
         
         rospy.on_shutdown(self.shutdown)
         
-        rate = 50
+        rate = 20
         tick = 1.0 / rate
         
         square_size = 0.5 # meters
         turn_angle = radians(90) # degrees
         speed_linear = 0.2
         speed_angular = 1.0
-        tolerance_linear = 0.02 # meters
-        tolerance_angular = radians(2) # degrees
+        tolerance_linear = 0.1 # meters
+        tolerance_angular = radians(10) # degrees
         
         # Publisher to control the robot's speed
         self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)
@@ -53,7 +52,7 @@ class NavSquare():
         self.odom = Odometry()
         
         # Subscribe to the /odom topic to get odometry data
-        odom_sub = rospy.Subscriber('/odom', Odometry, self.update_odom)
+        rospy.Subscriber('/odom', Odometry, self.update_odom)
         
         # Wait for the /odom topic to become available
         rospy.wait_for_message('/odom', Odometry)

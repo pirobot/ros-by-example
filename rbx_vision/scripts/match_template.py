@@ -22,7 +22,7 @@ if __name__ == '__main__':
         test_file = sys.argv[2]
     except:
         target_file = "test_images/mona_lisa_face.png"
-        test_file = "test_images/mona_lisa.png"
+        test_file = "test_images/mona_lisa_rotated_45.png"
         
         print help_message
         
@@ -41,10 +41,10 @@ if __name__ == '__main__':
         
     # Smallest template size in pixels we will consider
     min_template_size = 75
-    max_template_size = 300
+    max_template_size = 250
     
     # What multiplier should we use between adjacent scales
-    scale_factor = 1.1 # 10% increases
+    scale_factor = 1.2 # 20% increases
     
     # Read in the template and test image
     template = cv2.imread(target_file, cv.CV_LOAD_IMAGE_COLOR)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         max_scale = 0.9 * min(width_ratio, height_ratio)
         
         max_template_dimension = max(template.shape[0], template.shape[1])
-        min_scale = 1.1 * float(min_template_size) / max_template_dimension
+        min_scale = 1.2 * float(min_template_size) / max_template_dimension
         
         # Create a list of scales we will use
         scales = list()
@@ -68,13 +68,16 @@ if __name__ == '__main__':
             scale *= scale_factor
             if scale * max_template_dimension > max_template_size:
                 break
+            
         
         # And a set of rotation angles
-        rotations = [-60, -30, 0, 30, 60]
-        rotations = [0]
+        rotations = [-30, 0, 30]
     else:
         scales = [1]
         rotations = [0]
+        
+    print "Number of scales:", len(scales)
+    print "Number of orientations:", len(rotations)
 
     # We need a copy of the original images for later work
     template_start = template.copy()
@@ -181,12 +184,15 @@ if __name__ == '__main__':
             cv2.ellipse(image, match_box, cv.RGB(255, 255, 50), 2)
         
     if maxScore > match_threshold or ignore_threshold:
-        cv2.rectangle(image, (best_x, best_y), (best_x + w, best_y + h), cv.RGB(50, 255, 50), 4)
+        cv2.ellipse(image, best_match_box, cv.RGB(50, 255, 50), 4)
+        #cv2.rectangle(image, (best_x, best_y), (best_x + w, best_y + h), cv.RGB(50, 255, 50), 4)
     
     cv2.imshow("Template", template_start)
     cv2.imshow("Test Image", image)
     cv2.namedWindow("Correlation", cv.CV_WINDOW_AUTOSIZE)
     cv2.imshow("Correlation", best_result)
+    #cv2.imshow("Best Template", best_template)
+
     
     cv.MoveWindow("Template", 10, 10)
     cv.MoveWindow("Test Image", template_start.shape[1] + 20, 10)

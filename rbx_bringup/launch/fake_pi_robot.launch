@@ -1,11 +1,11 @@
 <launch>
   <!-- Load the URDF/Xacro model of our robot -->
-  <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find turtlebot_description)/urdf/turtlebot.urdf.xacro'" />
-   
+  <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find pi_robot_description)/urdf/pi_robot.xacro'" />
+
   <param name="robot_description" command="$(arg urdf_file)" />
     
   <node name="arbotix" pkg="arbotix_python" type="driver.py" output="screen">
-      <rosparam file="$(find pi_nav)/config/fake_turtlebot_arbotix.yaml" command="load" />
+      <rosparam file="$(find rbx_bringup)/config/fake_pi_arbotix.yaml" command="load" />
       <param name="sim" value="true"/>
   </node>
   
@@ -14,13 +14,23 @@
   </node>
   
   <!-- Provide simulated control of the robot joint angles -->
+  <!--
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-     <param name="use_gui" value="False" />
+     <param name="use_gui" value="True" />
      <param name="rate" value="20.0"/>
   </node>
-  
-  <node pkg="tf" type="static_transform_publisher" name="odom_world_broadcaster" args="0 0 0 0 0 0 /odom /odom_combined 100" />
+  -->
+    
+  <!--
+  <node name="pi_robot_arm_down" pkg="rbx_bringup" type="pi_robot_arm_down">
+     <param name="rate" value="5.0"/>
+  </node>
+  -->
 
-  <node pkg="turtlebot_arm_bringup" type="fake_pub.py" name="fake_pub" />
-
+  <!--
+  <node name="gripper_controller" pkg="arbotix_controllers" type="one_side_gripper_controller.py">
+      <param name="invert" value="true"/>
+      <param name="pad_width" value="0.0254"/>
+  </node>
+  -->
 </launch>

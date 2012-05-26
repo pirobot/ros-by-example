@@ -1,0 +1,16 @@
+<package>
+  <description brief="rbx_bringup">
+
+     rbx_bringup
+
+  </description>
+  <author>Patrick Goebel</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rbx_bringup</url>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+
+</package>
+
+
