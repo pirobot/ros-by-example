@@ -36,15 +36,16 @@ class NavSquare():
         
         rospy.on_shutdown(self.shutdown)
         
-        rate = 20
+        rate = 100
         tick = 1.0 / rate
         
-        square_size = 0.5 # meters
+        square_size = 1.0 # meters
         turn_angle = radians(90) # degrees
-        speed_linear = 0.2
+        speed_linear = 0.5
         speed_angular = 1.0
-        tolerance_linear = 0.1 # meters
-        tolerance_angular = radians(10) # degrees
+        tolerance_linear = 0.025 # meters
+        tolerance_angular = radians(2.5) # degrees
+        print tolerance_angular
         
         # Publisher to control the robot's speed
         self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)
@@ -60,26 +61,19 @@ class NavSquare():
         # Wait until we actually have some data
         while self.odom == Odometry():
             rospy.sleep(1)
-            
-        euler_angles = euler_from_quaternion([self.odom.pose.pose.orientation.x, self.odom.pose.pose.orientation.y, self.odom.pose.pose.orientation.z, self.odom.pose.pose.orientation.w], axes='sxyz')
-        
-        if euler_angles[2] < 0:
-            start_angle = 2 * pi + euler_angles[2]
-        else:
-            start_angle = euler_angles[2]
-            
+
+        # Cycle through the four sides of the square
         for i in range(4):
             # Get the starting odometry values     
             odom_start = self.odom
             x_start = odom_start.pose.pose.position.x
             y_start = odom_start.pose.pose.position.y
-            target_angle = (i + 1) * turn_angle + start_angle
             
             # First move along a side
             move_cmd = Twist()
             waypoint_success = False
             
-            while not waypoint_success:
+            while not waypoint_success and not rospy.is_shutdown():
                 error = sqrt(pow((x_start - self.odom.pose.pose.position.x), 2) +  pow((y_start - self.odom.pose.pose.position.y), 2)) - square_size
                 if abs(error) <  tolerance_linear:
                     waypoint_success = True
@@ -94,16 +88,26 @@ class NavSquare():
             
             # Now rotate 90 degrees
             move_cmd = Twist()
-            while not waypoint_success:
-                current_angles = euler_from_quaternion([self.odom.pose.pose.orientation.x, self.odom.pose.pose.orientation.y, self.odom.pose.pose.orientation.z, self.odom.pose.pose.orientation.w], axes='sxyz')
+            orientation = euler_from_quaternion([self.odom.pose.pose.orientation.x, self.odom.pose.pose.orientation.y, self.odom.pose.pose.orientation.z, self.odom.pose.pose.orientation.w], axes='sxyz')
+            start_angle = orientation[2]
+            if start_angle < 0:
+                start_angle = 2 * pi + start_angle
+            
+            #rospy.loginfo("Start Angle: " + str(start_angle))
+
+            while not waypoint_success and not rospy.is_shutdown():
+                orientation = euler_from_quaternion([self.odom.pose.pose.orientation.x, self.odom.pose.pose.orientation.y, self.odom.pose.pose.orientation.z, self.odom.pose.pose.orientation.w], axes='sxyz')
                 
-                if current_angles[2] < 0:
-                    current_angle = 2 * pi + current_angles[2]
-                else:
-                    current_angle = current_angles[2]
-                    
-                #error = current_angle - (turn_angle + start_angle)
-                error = current_angle - target_angle
+                current_angle = orientation[2]
+                if current_angle < 0:
+                    current_angle = 2 * pi + current_angle
+                                    
+                target_angle = (start_angle + turn_angle) % (2 * pi)
+                
+                error = current_angle -  target_angle
+                
+                if abs(error) >= pi:
+                    error = abs(error) - 2 * pi
 
                 if abs(error) <  tolerance_angular:
                     waypoint_success = True

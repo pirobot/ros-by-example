@@ -8,7 +8,7 @@
 """
 
 import roslib
-roslib.load_manifest('pi_video_tracker')
+roslib.load_manifest('rbx_vision')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 import sys
@@ -129,11 +129,8 @@ class FaceTracker(ROS2OpenCV2):
         rospy.loginfo("Ready.")
         
     def process_image(self, cv_image):
-        # Create a numpy array version of the image as required by many of the cv2 functions
-        cv_array = np.array(cv_image, dtype=np.uint8)
-
         # Create a greyscale version of the image
-        self.grey = cv2.cvtColor(cv_array, cv2.COLOR_BGR2GRAY)
+        self.grey = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         
         # Equalize the histogram to reduce lighting effects.
         self.grey = cv2.equalizeHist(self.grey)
@@ -171,33 +168,6 @@ class FaceTracker(ROS2OpenCV2):
             else:
                 self.frame_index += 1
                 self.expand_roi = self.expand_roi_init
-                
-#            """ Step 6: Check to see if we need to add a new template """
-#            if self.frame_index % self.check_template_interval == 0 and self.track_box and self.is_rect_nonzero(self.track_box): 
-#                #self.check_templates(cv_image, self.track_box)
-#                max_score = 0
-#                for template in self.templates:
-#                    try:
-#                        (score, track_box) = self.match_template(cv_image, template, self.track_box)
-#                    except:
-#                        continue
-#                    if score > max_score:
-#                        max_score = score
-#                        best_track_box = track_box
-#                        
-#                #rospy.loginfo("Best Score: " + str(max_score))
-#                
-#                if max_score > 0.7:
-#                    pass
-#                    #self.keypoints = list()
-#                    #self.track_box = best_track_box
-#                    #self.detect_box = None
-#                    #(center, size, angle) = self.track_box
-#                    #pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
-#                    #self.detect_box = (pt1[0], pt1[1], size[0], size[1])
-#                elif max_score > 0:
-#                    self.templates.append(self.get_template(cv_image, self.track_box))
-#                    rospy.loginfo("Adding Template: " + str(len(self.templates) + 1))  
                          
         else:         
             self.keypoints = []
@@ -230,7 +200,7 @@ class FaceTracker(ROS2OpenCV2):
             pt2 = (sx + sw, sy + sh)
             search_image = self.grey[pt1[1]:pt2[1], pt1[0]:pt2[0]]
             if self.show_boxes:
-                cv.Rectangle(self.marker_image, pt1, pt2, cv.RGB(0, 0, 255), 3)
+                cv2.rectangle(self.marker_image, pt1, pt2, cv.RGB(0, 0, 255), 3)
         else:
             """ Reduce input image size for faster processing """
             search_image = cv2.resize(self.grey, (self.grey.shape[1] / self.haar_image_scale, self.grey.shape[0] / self.haar_image_scale))
@@ -308,7 +278,7 @@ class FaceTracker(ROS2OpenCV2):
             
             face_box = (pt1[0], pt1[1], face_width, face_height)
             if self.show_boxes:
-                cv.Rectangle(self.marker_image, pt1, pt2, cv.RGB(0, 255, 0), 3)
+                cv2.rectangle(self.marker_image, pt1, pt2, cv.RGB(0, 255, 0), 3)
             
             if face_box is not None:
                 self.ROI = RegionOfInterest()
@@ -360,7 +330,7 @@ class FaceTracker(ROS2OpenCV2):
 
         if self.show_features:
             for x, y in self.keypoints:
-                cv.Circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)
+                cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)
                 
         if self.auto_min_keypoints:
             """ Since the detect box is larger than the actual face or desired patch, shrink the number of features by 10% """
@@ -381,7 +351,7 @@ class FaceTracker(ROS2OpenCV2):
                     continue
                 new_keypoints.append((x, y))
                 if self.show_features:
-                    cv.Circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)
+                    cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)
             self.keypoints = new_keypoints
             
         """ Draw the best fit ellipse around the feature points """
@@ -449,7 +419,7 @@ class FaceTracker(ROS2OpenCV2):
         pt1 = (x - int(w_new / 2), y - int(h_new / 2))
         pt2 = (x + int(w_new / 2), y + int(h_new / 2))
 
-        cv.Rectangle(self.marker_image, pt1, pt2, cv.RGB(255, 255, 0))
+        cv2.rectangle(self.marker_image, pt1, pt2, cv.RGB(255, 255, 0))
         
         mask_box = ((x, y), (w_new, h_new), a)
 
@@ -483,7 +453,7 @@ class FaceTracker(ROS2OpenCV2):
                 distance = self.distance_to_cluster((x,y), self.keypoints)
                 if distance > self.add_keypoint_distance:
                     self.keypoints.append((x,y))
-                    cv.Circle(self.marker_image, (x, y), 3, (255, 255, 0, 0), cv.CV_FILLED, 2, 0)
+                    cv2.circle(self.marker_image, (x, y), 3, (255, 255, 0, 0), cv.CV_FILLED, 2, 0)
                                     
             """ Remove duplicate keypoints """
             self.keypoints = list(set(self.keypoints))
@@ -510,10 +480,8 @@ class FaceTracker(ROS2OpenCV2):
         n_z = n_xy
         
         if self.use_depth_for_tracking:
-            if not self.depth_image:
+            if self.depth_image is None:
                 return ((0, 0, 0), 0, 0, -1)
-            else:
-                (cols, rows) = cv.GetSize(self.depth_image)
         
         """ If there are no keypoints left to track, start over """
         if n_xy == 0:
@@ -530,7 +498,7 @@ class FaceTracker(ROS2OpenCV2):
         if self.use_depth_for_tracking:
             for point in self.keypoints:
                 try:
-                    z = cv.Get2D(self.depth_image, min(rows - 1, int(point[1])), min(cols - 1, int(point[0])))
+                    z = cv.Get2D(self.depth_image, min(self.frame_height - 1, int(point[1])), min(self.frame_width - 1, int(point[0])))
                 except:
                     continue
                 z = z[0]
@@ -566,7 +534,7 @@ class FaceTracker(ROS2OpenCV2):
             if std_err > outlier_threshold:
                 keypoints_xy.remove(point)
                 # Briefly mark the removed points in red
-                cv.Circle(self.marker_image, (point[0], point[1]), 2, (0, 0, 255), cv.CV_FILLED)   
+                cv2.circle(self.marker_image, (point[0], point[1]), 2, (0, 0, 255), cv.CV_FILLED)   
                 try:
                     keypoints_z.remove(point)
                     n_z = n_z - 1
@@ -580,19 +548,22 @@ class FaceTracker(ROS2OpenCV2):
             sse = 0
             for point in keypoints_z:
                 try:
-                    z = cv.Get2D(self.depth_image, min(rows - 1, int(point[1])), min(cols - 1, int(point[0])))
+                    z = cv.Get2D(self.depth_image, min(self.frame_height - 1, int(point[1])), min(self.frame_width - 1, int(point[0])))
                     z = z[0]
                     sse = sse + (z - mean_z) * (z - mean_z)
                 except:
                     n_z = n_z - 1
             
-            mse_z = sse / n_z
+            if n_z != 0:
+                mse_z = sse / n_z
+            else:
+                mse_z = 0
             
             """ Throw away the outliers based on depth using percent error rather than standard error since depth
                  values can jump dramatically at object boundaries  """
             for point in keypoints_z:
                 try:
-                    z = cv.Get2D(self.depth_image, min(rows - 1, int(point[1])), min(cols - 1, int(point[0])))
+                    z = cv.Get2D(self.depth_image, min(self.frame_height - 1, int(point[1])), min(self.frame_width - 1, int(point[0])))
                     z = z[0]
                 except:
                     continue
@@ -614,44 +585,6 @@ class FaceTracker(ROS2OpenCV2):
             score = 1
 
         return ((mean_x, mean_y, mean_z), mse_xy, mse_z, score)
-    
-    def drop_keypoints2(self, min_keypoints):
-        keypoints = self.keypoints
-        
-        model = cv2.SVM()
-        
-        params = dict( kernel_type = cv2.SVM_LINEAR, 
-                       svm_type = cv2.SVM_ONE_CLASS, nu = 0.00001 )
-        
-        samples = np.array(keypoints, dtype=np.float32)
-        responses = np.array(np.empty([1,2]), dtype=np.float32)
-        
-        #start = time()
-        model.train(samples, responses, params = params)
-        #duration = time() - start
-        #print "Duration:", duration
-        
-        count = 0
-        for p in keypoints:
-            if model.predict(np.array(p, dtype=np.float32)) == 0:
-                count += 1
-                if self.show_features:
-                    cv.Circle(self.marker_image, (p[0], p[1]), 2, (0, 0, 255), cv.CV_FILLED)   
-                keypoints.remove(p)
-        
-        print len(self.keypoints), " ", count   
-        self.keypoints = keypoints
-            
-        """ Consider a cluster bad if we have fewer than min_keypoints left """
-        if len(self.keypoints) < min_keypoints:
-            score = -1
-        else:
-            score = 1
-
-        return score
-
-    
-        
     
 def main(args):
       FT = FaceTracker("face_tracker")

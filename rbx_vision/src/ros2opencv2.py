@@ -37,7 +37,7 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image, RegionOfInterest, CameraInfo
 from cv_bridge import CvBridge, CvBridgeError
 import time
-
+import numpy as np
 
 class ROS2OpenCV2:
     def __init__(self, node_name):
@@ -51,14 +51,18 @@ class ROS2OpenCV2:
         self.show_boxes = rospy.get_param("~show_boxes", True)
         self.flip_image = rospy.get_param("~flip_image", False)
 
-        """ Initialize the Region of Interest and its publisher """
+        # Initialize the Region of Interest and its publisher
         self.ROI = RegionOfInterest()
         self.pubROI = rospy.Publisher("/roi", RegionOfInterest)
         
-        """ Initialize a number of global variables """
+        # Initialize a number of global variables
         self.frame = None
         self.frame_size = None
+        self.frame_width = None
+        self.frame_height = None
         self.depth_image = None
+        self.marker_image = None
+        self.display_image = None
         self.grey = None
         self.prev_grey = None
         self.selected_point = None
@@ -75,28 +79,33 @@ class ROS2OpenCV2:
         self.cps_values = list()
         self.cps_n_values = 20
         self.busy = False
+        self.resize_window_width = 640
+        self.resize_window_height = 480
+        
+        self.show_text = True
 
-        """ Create the display window """
+        # Create the display window
         self.cv_window_name = self.node_name
         cv.NamedWindow(self.cv_window_name, cv.CV_WINDOW_NORMAL)
-        cv.ResizeWindow(self.cv_window_name, 640, 480)
+        if self.resize_window_height > 0 and self.resize_window_width > 0:
+            cv.ResizeWindow(self.cv_window_name, self.resize_window_width, self.resize_window_height)
         
-        """ Create the cv_bridge object """
+        # Create the cv_bridge object
         self.bridge = CvBridge()
         
         """ Set a call back on mouse clicks on the image window """
         cv.SetMouseCallback (self.node_name, self.on_mouse_click, None)
         
-        """ Subscribe to the raw camera image topic and set the image processing callback """
+        # Subscribe to the image and depth topics and set the appropriate callbacks
         self.image_sub = rospy.Subscriber("input_rgb_image", Image, self.image_callback, queue_size=1)
         self.depth_sub = rospy.Subscriber("input_depth_image", Image, self.depth_callback, queue_size=1)
         
-        rospy.loginfo("Starting " + self.node_name)
-        
+        rospy.loginfo("Waiting for video topic(s)...")
+                    
     def on_mouse_click(self, event, x, y, flags, param):
         """ We will usually use the mouse to select points to track or to draw a rectangle
             around a region of interest. """
-        if not self.frame:
+        if self.frame is None:
             return
         
         #if self.frame.origin:
@@ -117,76 +126,67 @@ class ROS2OpenCV2:
         if self.drag_start:
             xmin = max(0, min(x, self.drag_start[0]))
             ymin = max(0, min(y, self.drag_start[1]))
-            xmax = min(self.frame.width, max(x, self.drag_start[0]))
-            ymax = min(self.frame.height, max(y, self.drag_start[1]))
+            xmax = min(self.frame_width, max(x, self.drag_start[0]))
+            ymax = min(self.frame_height, max(y, self.drag_start[1]))
             self.selection = (xmin, ymin, xmax - xmin, ymax - ymin)
             
     def depth_callback(self, data):
         depth_image = self.convert_depth_image(data)
         
         if self.flip_image:    
-            cv.Flip(depth_image)
+            depth_image = cv2.flip(depth_image, 0)
             
-        if not self.depth_image:
-            (cols, rows) = cv.GetSize(depth_image)
-            self.depth_image = cv.CreateMat(rows, cols, cv.CV_32FC1)
-            
-        cv.Copy(depth_image, self.depth_image)
+        self.depth_image = depth_image.copy()
 
     def image_callback(self, data):
-        """ Store the image header in a global variable.  We need this so we can access
-            the timestamp and frame_id of each frame. """
+        # Store the image header in a global variable
         self.image_header = data.header
 
-        """ Time this loop to get cycles per second """
+        # Time this loop to get cycles per second
         start = time.time()
         
-        """ Convert the raw image to OpenCV format using the convert_image() helper function """
+        # Convert the raw image to OpenCV format using cv_bridge helper function
         frame = self.convert_image(data)
         
-        """ Some webcams invert the image """
+        # Some webcams invert the image
         if self.flip_image:
-            cv.Flip(frame)
-                    
-        """ Create a few images we will use for display """
-        if not self.frame:
-            self.frame_size = cv.GetSize(frame)
-            self.cols, self.rows = cv.GetSize(frame)
-            self.frame_type = frame.type
-            self.frame = cv.CreateMat(self.rows, self.cols, self.frame_type)
-            self.marker_image = cv.CreateMat(self.rows, self.cols, self.frame_type)
-            self.display_image = cv.CreateMat(self.rows, self.cols, self.frame_type)
-            self.processed_image = cv.CreateMat(self.rows, self.cols, self.frame_type)
-            cv.SetZero(self.marker_image)
-        
-        """ Copy the current frame to the global image in case we need it elsewhere"""
-        self.frame = cv.CloneMat(frame)
+            frame = cv2.flip(frame, 0)
             
+        if self.frame_width is None:
+            self.frame_size = (frame.shape[1], frame.shape[0])
+            self.frame_width, self.frame_height = self.frame_size            
+            
+        # Create the marker image we will use for display purposes
+        if self.marker_image is None:
+            self.marker_image = np.zeros_like(frame)
+            
+        # Copy the current frame to the global image in case we need it elsewhere
+        self.frame = frame.copy()
+
+        # Reset the marker image if we're not displaying the history
         if not self.keep_marker_history:
-            cv.SetZero(self.marker_image)
+            self.marker_image = np.zeros_like(self.marker_image)
         
-        """ Process the image to detect and track objects or features """
-        if not self.busy:
-            processed_image = self.process_image(frame)
-        else:
-            time.sleep(0.0333)
-            return
+        # Process the image to detect and track objects or features
+        processed_image = self.process_image(frame)
         
-        """ If the result is a greyscale image, convert to 3-channel for display purposes """
+        # If the result is a greyscale image, convert to 3-channel for display purposes """
         #if processed_image.channels == 1:
             #cv.CvtColor(processed_image, self.processed_image, cv.CV_GRAY2BGR)
         #else:
-        self.processed_image = cv.CloneMat(processed_image)
         
-        """ Display the user-selection rectangle or point."""
-        self.display_markers()
+        # Make a global copy
+        self.processed_image = processed_image.copy()
+        
+        # Display the user-selection rectangle or point 
+        self.display_selection()
         
         if self.night_mode:
-            """ Night mode: only display the markers """
-            cv.SetZero(self.processed_image)
+            # Night mode: only display the markers
+            self.processed_image = np.zeros_like(self.processed_image)
             
-        """ Merge the processed image and the marker image """ 
-        cv.Or(self.processed_image, self.marker_image, self.display_image)
+        # Merge the processed image and the marker image
+        self.display_image = cv2.bitwise_or(self.processed_image, self.marker_image)
 
         if self.track_box is not None:
             try:
@@ -195,7 +195,7 @@ class ROS2OpenCV2:
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 #cv.Rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 2, 8, 0)
                 if self.show_boxes:
-                    cv.EllipseBox(self.display_image, self.track_box, cv.CV_RGB(255, 0, 0), 1)
+                    cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), 1)
             except:
                 x,y,w,h = self.track_box
                 size = w, h
@@ -203,13 +203,13 @@ class ROS2OpenCV2:
                 pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 try:
-                    cv.Rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 1, 8, 0)
+                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 1, 8, 0)
                 except:
                     print pt1, pt2
         elif self.detect_box is not None:
             (pt1_x, pt1_y, w, h) = self.detect_box
             if self.show_boxes:
-                cv.Rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(255, 0, 0), 1, 8, 0)
+                cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), 1, 8, 0)
         
         """ Handle keyboard events """
         self.keystroke = cv.WaitKey(5)
@@ -223,9 +223,9 @@ class ROS2OpenCV2:
         self.cps = int(sum(self.cps_values) / len(self.cps_values))
         
         if self.show_text:
-            hscale = 0.2 * self.frame_size[0] / 160. + 0.1
-            vscale = 0.2 * self.frame_size[1] / 120. + 0.1
-            text_font = cv.InitFont(cv.CV_FONT_VECTOR0, hscale, vscale, 0, 1, 8)
+            font_face = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.5
+
             """ Print cycles per second (CPS) and resolution (RES) at top of the image """
             if self.frame_size[0] >= 640:
                 vstart = 25
@@ -236,11 +236,11 @@ class ROS2OpenCV2:
             else:
                 vstart = 10
                 voffset = int(20 + self.frame_size[1] / 120.)
-            cv.PutText(self.display_image, "CPS: " + str(self.cps), (10, vstart), text_font, cv.RGB(255, 255, 0))
-            cv.PutText(self.display_image, "RES: " + str(self.frame_size[0]) + "X" + str(self.frame_size[1]), (10, voffset), text_font, cv.RGB(255, 255, 0))
+            cv2.putText(self.display_image, "CPS: " + str(self.cps), (10, vstart), font_face, font_scale, cv.RGB(255, 255, 0))
+            cv2.putText(self.display_image, "RES: " + str(self.frame_size[0]) + "X" + str(self.frame_size[1]), (10, voffset), font_face, font_scale, cv.RGB(255, 255, 0))
         
         # Now display the image.
-        cv.ShowImage(self.node_name, self.display_image)
+        cv2.imshow(self.node_name, self.display_image)
         
         """ Process any keyboard commands """
         if 32 <= self.keystroke and self.keystroke < 128:
@@ -258,17 +258,20 @@ class ROS2OpenCV2:
                 rospy.signal_shutdown("User hit q key to quit.")      
           
     def convert_image(self, ros_image):
+        # Use cv_bridge() to convert the ROS image to OpenCV format
         try:
-            frame = cv.GetMat(self.bridge.imgmsg_to_cv(ros_image, "bgr8"))
-            return frame
+            cv_image = self.bridge.imgmsg_to_cv(ros_image, "bgr8")       
+            return np.array(cv_image, dtype=np.uint8)
         except CvBridgeError, e:
             print e
           
     def convert_depth_image(self, ros_image):
         try:
             depth_image = self.bridge.imgmsg_to_cv(ros_image, "32FC1")
+            # Convert to a numpy array since this is what OpenCV 2.3 uses
+            depth_image = np.array(depth_image, dtype=np.float32)
             return depth_image
-    
+        
         except CvBridgeError, e:
             print e
           
@@ -285,43 +288,60 @@ class ROS2OpenCV2:
         
         return frame
     
-    def display_markers(self):
+    def display_selection(self):
         # If the user is selecting a region with the mouse, display the corresponding rectangle for feedback.
         if self.drag_start and self.is_rect_nonzero(self.selection):
             x,y,w,h = self.selection
-            cv.Rectangle(self.marker_image, (x, y), (x + w, y + h), (0, 255, 255), 2)
+            cv2.rectangle(self.marker_image, (x, y), (x + w, y + h), (0, 255, 255), 2)
             self.selected_point = None
 
         # Else if the user has clicked on a point on the image, display it as a small circle.            
         elif not self.selected_point is None:
             x = self.selected_point[0]
             y = self.selected_point[1]
-            cv.Circle(self.marker_image, (x, y), 3, (0, 255, 255), 2)
+            cv2.circle(self.marker_image, (x, y), 3, (0, 255, 255), 2)
         
-    def is_rect_nonzero(self, r):
+    def is_rect_nonzero(self, rect):
         # First assume a simple CvRect type
         try:
-            (_, _, w, h) = r
+            (_,_,w,h) = rect
             return (w > 0) and (h > 0)
         except:
-            # Otherwise, assume a CvBox2D type
-            ((_,_), (w,h), a) = r
-            return (w > 0) and (h > 0)
+            try:
+                # Otherwise, assume a CvBox2D type
+                ((_,_),(w,h),a) = rect
+                return (w > 0) and (h > 0)
+            except:
+                return False
         
-    def cvRect_to_cvBox2D(self, roi):
-        if len(roi) == 3:
-            (center, size, angle) = roi
-            pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
-            pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-            rect = (pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1])
-        else:
-            (p1_x, p1_y, width, height) = roi
-            center = (int(p1_x + width / 2), int(p1_y + height / 2))
-            size = (width, height)
-            angle = 0
-            rect = (center, size, angle)
+    def cvBox2D_to_cvRect(self, roi):
+        try:
+            if len(roi) == 3:
+                (center, size, angle) = roi
+                pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
+                pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
+                rect = (pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1])
+            else:
+                rect = roi
+        except:
+            return None
             
         return rect
+        
+    def cvRect_to_cvBox2D(self, roi):
+        try:
+            if len(roi) == 3:
+                box2d = roi
+            else:
+                (p1_x, p1_y, width, height) = roi
+                center = (int(p1_x + width / 2), int(p1_y + height / 2))
+                size = (width, height)
+                angle = 0
+                box2d = (center, size, angle)
+        except:
+            return None
+            
+        return box2d
         
     def cleanup(self):
         print "Shutting down vision node."
@@ -334,7 +354,7 @@ def main(args):
     print help_message
           
     # Fire up the node.
-    ROS2OpenCV2("ros2opencv")
+    ROS2OpenCV2("ros2opencv2")
     
     try:
         rospy.spin()

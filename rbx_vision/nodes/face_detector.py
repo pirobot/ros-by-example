@@ -6,14 +6,13 @@
 """
 
 import roslib
-roslib.load_manifest('pi_video_tracker')
+roslib.load_manifest('rbx_vision')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 import sys
 import cv2.cv as cv
 import cv2
 from sensor_msgs.msg import Image, RegionOfInterest
-import numpy as np
 
 class FaceDetector(ROS2OpenCV2):
     def __init__(self, node_name):
@@ -25,6 +24,7 @@ class FaceDetector(ROS2OpenCV2):
         self.fov_width = rospy.get_param("~fov_width", 1.094)
         self.fov_height = rospy.get_param("~fov_height", 1.094)
         self.max_face_size = rospy.get_param("~max_face_size", 0.28)
+        self.use_last_face_box = rospy.get_param("~use_last_face_box", False)
         
         # Intialize the detection box
         self.detect_box = None
@@ -39,9 +39,8 @@ class FaceDetector(ROS2OpenCV2):
         
         self.hits = 0
         self.misses = 0
+        self.hit_rate = 0
         
-        rospy.loginfo("Waiting for video topics to become available...")
-
         # Wait until the image topics are ready before starting
         rospy.wait_for_message("input_rgb_image", Image)
         
@@ -51,11 +50,8 @@ class FaceDetector(ROS2OpenCV2):
         rospy.loginfo("Ready.")
 
     def process_image(self, cv_image):
-        # Create a numpy array version of the image as required by many of the cv2 functions
-        cv_array = np.array(cv_image, dtype=np.uint8)
-
         # Create a greyscale version of the image
-        self.grey = cv2.cvtColor(cv_array, cv2.COLOR_BGR2GRAY)
+        self.grey = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         
         # STEP 1. Load a detector if one is specified
         if not self.detector_loaded:
@@ -69,7 +65,7 @@ class FaceDetector(ROS2OpenCV2):
         else:
             self.misses += 1
             
-        rospy.loginfo("Hit Rate: " + str(float(self.hits) / (self.hits + self.misses)))
+        self.hit_rate = float(self.hits) / (self.hits + self.misses)
                 
         return cv_image
     
@@ -103,7 +99,7 @@ class FaceDetector(ROS2OpenCV2):
         """ Equalize the histogram to reduce lighting effects. """
         self.grey = cv2.equalizeHist(self.grey)
         
-        if self.last_face_box is not None:
+        if self.use_last_face_box and self.last_face_box is not None:
             self.search_scale = 1.5
             x, y, w, h = self.last_face_box
             w_new = int(self.search_scale * w)
@@ -113,7 +109,8 @@ class FaceDetector(ROS2OpenCV2):
             pt1 = (sx, sy)
             pt2 = (sx + sw, sy + sh)
             search_image = self.grey[pt1[1]:pt2[1], pt1[0]:pt2[0]]
-            cv.Rectangle(self.marker_image, pt1, pt2, cv.RGB(0, 255, 0), 2)
+            if self.show_boxes:
+                cv2.rectangle(self.marker_image, pt1, pt2, cv.RGB(255, 255, 50), 2)
         else:
             """ Reduce input image size for faster processing """
             search_image = cv2.resize(self.grey, (self.grey.shape[1] / self.image_scale, self.grey.shape[0] / self.image_scale))
@@ -134,16 +131,20 @@ class FaceDetector(ROS2OpenCV2):
             if not len(faces):
                 self.last_face_box = None
                 if self.show_text:
-                    hscale = 0.4 * self.frame_size[0] / 160. + 0.1
-                    vscale = 0.4 * self.frame_size[1] / 120. + 0.1
-                    text_font = cv.InitFont(cv.CV_FONT_VECTOR0, hscale, vscale, 0, 1, 8)
-                    cv.PutText(self.marker_image, "LOST FACE!", (50, int(self.frame_size[1] * 0.9)), text_font, cv.RGB(255, 255, 0))
+                    font_face = cv2.FONT_HERSHEY_SIMPLEX
+                    font_scale = 0.5
+                    cv2.putText(self.marker_image, "LOST FACE!", (20, int(self.frame_size[1] * 0.9)), font_face, font_scale, cv.RGB(255, 50, 50))
                 return None
+            
+        if self.show_text:
+            font_face = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.5
+            cv2.putText(self.marker_image, "Hit Rate: " + str(trunc(self.hit_rate, 2)), (20, int(self.frame_size[1] * 0.9)), font_face, font_scale, cv.RGB(255, 255, 0))
                 
         for (x, y, w, h) in faces:
-            """ The input to cv.HaarDetectObjects was resized, so scale the 
+            """ The input to the Haar detector was resized, so scale the 
                 bounding box of each face and convert it to two CvPoints """
-            if self.last_face_box is not None:
+            if self.use_last_face_box and self.last_face_box is not None:
                 s_x, s_y, s_w, s_h = search_box
                 pt1 = x + s_x, y + s_y
                 pt2 = pt1[0] + w, pt1[1] + h
@@ -202,6 +203,11 @@ class FaceDetector(ROS2OpenCV2):
 
             """ Break out of the loop after the first face """
             return face_box
+        
+def trunc(f, n):
+    '''Truncates/pads a float f to n decimal places without rounding'''
+    slen = len('%.*f' % (n, f))
+    return float(str(f)[:slen])
     
 def main(args):
       FD = FaceDetector("face_detector")
@@ -209,7 +215,7 @@ def main(args):
         rospy.spin()
       except KeyboardInterrupt:
         print "Shutting down face detector node."
-        cv.DestroyAllWindows()
+        cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main(sys.argv)

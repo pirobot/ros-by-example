@@ -9,7 +9,7 @@
     
     <param name="device_id" value="#1"/> <!-- this line uses first enumerated device -->
     <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
-    <param name="load_filepath" value="$(find ros2opencv)/params/SamplesConfig.xml" />
+    <param name="load_filepath" value="$(find openni_camera)/params/SamplesConfig.xml" />
     <param name="rgb_frame_id" value="/openni_rgb_optical_frame" />
     <param name="depth_frame_id" value="/openni_depth_optical_frame" />
     <param name="use_indices" value="false" />

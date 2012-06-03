@@ -71,4 +71,4 @@ if __name__ == '__main__':
     try:
         OutAndBack()
     except rospy.ROSInterruptException:
-        rospy.loginfo("Twist test finished.")
+        rospy.loginfo("ROS node terminated.")

@@ -13,6 +13,8 @@
   <depend package="rospy"/>
   <depend package="geometry_msgs"/>
   <depend package="nav_msgs"/>
+  <depend package="move_base_msgs"/>
+  <depend package="visualization_msgs"/>
   <depend package="tf"/>
   <depend package="actionlib"/>
 

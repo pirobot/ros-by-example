@@ -5,9 +5,9 @@ import cv2
 from common import anorm, clock
 from functools import partial
 
-help_message = '''SURF image match 
+help_message = '''SURF keypoints
 
-USAGE: surf_keypoints.py [ <image1> ]
+USAGE: surf_keypoints.py [ <image> ]
 '''
 
 def display_keypoints(img1, p1): 
@@ -35,8 +35,8 @@ if __name__ == '__main__':
     desc1.shape = (-1, surf.descriptorSize())
     print 'img1 - %d features' % (len(kp1))
 
-    display_keypoints(img1, displayed_kp1) # flann tends to find more distant second
-                                                   # neighbours, so r_threshold is decreased
+    display_keypoints(img1, displayed_kp1)
+    
     print "Elapsed time:", 1000 * (clock() - start)
     cv2.imshow('Display SURF Keypoints', img1)
     cv2.waitKey()

@@ -8,7 +8,7 @@
 """
 
 import roslib
-roslib.load_manifest('pi_video_tracker')
+roslib.load_manifest('rbx_vision')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 import sys
@@ -267,7 +267,7 @@ class FaceTracker(ROS2OpenCV2):
         if p is not None:
             for x, y in np.float32(p).reshape(-1, 2):
                 self.keypoints.append((x, y))
-                cv.Circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)                
+                cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)                
                     
     def track_keypoints(self):
         if len(self.keypoints) > 0:
@@ -282,7 +282,7 @@ class FaceTracker(ROS2OpenCV2):
                 if not good_flag:
                     continue
                 new_keypoints.append((x, y))
-                cv.Circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)
+                cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)
             self.keypoints = new_keypoints
             
         """ Draw the best fit ellipse around the feature points """

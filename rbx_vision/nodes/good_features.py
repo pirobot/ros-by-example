@@ -6,7 +6,7 @@
 """
 
 import roslib
-roslib.load_manifest('pi_video_tracker')
+roslib.load_manifest('rbx_vision')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 import sys
@@ -30,6 +30,7 @@ class GoodFeatures(ROS2OpenCV2):
         self.blockSize = rospy.get_param("~blockSize", 10)
         self.useHarrisDetector = rospy.get_param("~useHarrisDetector", False)
         self.k = rospy.get_param("~k", 0.04)
+        self.flip_image = rospy.get_param("~flip_image", False)
         
         self.gf_params = dict( maxCorners = self.maxCorners, 
                        qualityLevel = self.qualityLevel,
@@ -44,16 +45,14 @@ class GoodFeatures(ROS2OpenCV2):
 
         self.detect_box = None
         self.mask = None
+        
 
     def process_image(self, cv_image):
         if not self.detect_box:
             return cv_image
-        
-        # Create a numpy array version of the image as required by many of the cv2 functions
-        cv_array = np.array(cv_image, dtype=np.uint8)
 
         # Create a greyscale version of the image
-        self.grey = cv2.cvtColor(cv_array, cv2.COLOR_BGR2GRAY)
+        self.grey = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
 
         """ Redetect features at the given interval """        
         if self.frame_idx % self.detect_interval == 0:
@@ -93,7 +92,7 @@ class GoodFeatures(ROS2OpenCV2):
         if p is not None:
             for x, y in np.float32(p).reshape(-1, 2):
                 self.keypoints.append([(x, y)])
-                cv.Circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)    
+                cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)    
 
 def main(args):
       GF = GoodFeatures("good_features")

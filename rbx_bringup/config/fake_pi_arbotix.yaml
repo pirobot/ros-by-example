@@ -17,9 +17,6 @@ dynamixels: {
 }
 
 controllers: {
-   head_controller: {onboard: False, action_name: head_follow_joint_trajectory, type: follow_controller, joints: [head_pan_joint, head_tilt_joint]},
-   arm_controller: {onboard: False, type: follow_controller, joints: [arm_shoulder_pan_joint, arm_shoulder_lift_joint, arm_elbow_flex_joint, arm_wrist_flex_joint]},
-
    #  Pololu motors: 1856 cpr = 0.3888105m travel = 4773 ticks per meter (empirical: 4534)
-   base_controller: {type: diff_controller, base_width: 0.249, ticks_meter: 4534, Kp: 12, Kd: 12, Ki: 0, Ko: 50, accel_limit: 1.0 }
+   base_controller: {type: diff_controller, base_frame_id: base_link, base_width: 0.249, ticks_meter: 4534, Kp: 12, Kd: 12, Ki: 0, Ko: 50, accel_limit: 1.0 }
 }

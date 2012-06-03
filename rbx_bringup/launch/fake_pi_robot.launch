@@ -10,16 +10,14 @@
   </node>
   
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
-      <param name="publish_frequency" type="double" value="20.0" />
+      <param name="publish_frequency" type="double" value="50.0" />
   </node>
   
   <!-- Provide simulated control of the robot joint angles -->
-  <!--
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-     <param name="use_gui" value="True" />
+     <param name="use_gui" value="False" />
      <param name="rate" value="20.0"/>
   </node>
-  -->
     
   <!--
   <node name="pi_robot_arm_down" pkg="rbx_bringup" type="pi_robot_arm_down">
@@ -33,4 +31,5 @@
       <param name="pad_width" value="0.0254"/>
   </node>
   -->
+  
 </launch>
