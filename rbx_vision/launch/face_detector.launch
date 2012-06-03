@@ -1,0 +1,24 @@
+<launch>
+  <node pkg="rbx_vision" name="face_detector" type="face_detector.py" output="screen">
+
+    <remap from="input_rgb_image" to="/camera/rgb/image_color" />
+    <remap from="input_depth_image" to="/camera/depth/image" />
+    
+    <rosparam>
+      use_depth_for_detection: False
+      depth_threshold: 0.5
+      show_text: True
+      fov_width: 1.094
+      fov_height: 1.094
+      max_face_size: 0.28
+      use_last_face_box: True
+    </rosparam>
+    
+  	<param name="cascade_frontal_alt" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_frontalface_alt.xml" />
+   	<param name="cascade_frontal_alt2" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_frontalface_alt2.xml" />
+  	<param name="cascade_profile" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_profileface.xml" />
+   	<param name="cascade_upperbody" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_upperbody.xml" />
+   	<param name="cascade_eye" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_eye.xml" />
+
+  </node>
+</launch>

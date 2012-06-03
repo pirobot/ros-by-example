@@ -55,7 +55,7 @@ class OutAndBack():
         # Set the rotation speed to 1.0 radians per second
         rotate_left.angular.z = 1.0
         
-        """ For an out-and-back trajectory, se have to loop through two legs """
+        """ For an out-and-back trajectory, we have to loop once for each leg of the trip. """
         for i in range(2):
             # Move forward for 3 seconds
             ticks = int(3 * rate)

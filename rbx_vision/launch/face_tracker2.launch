@@ -1,0 +1,47 @@
+<launch>
+  <arg name="auto_face_tracking" default="True" />
+  
+  <node pkg="rbx_vision" name="face_tracker2" type="face_tracker2.py" output="screen">
+
+    <remap from="input_rgb_image" to="/camera/rgb/image_color" />
+    <remap from="input_depth_image" to="/camera/depth/image" />
+
+    <param name="auto_face_tracking" value="$(arg auto_face_tracking)" />
+    
+    <rosparam>
+      use_haar_only: False
+      use_depth_for_detection: False
+      use_depth_for_tracking: True
+      auto_min_keypoints: True
+      min_keypoints: 20
+      abs_min_keypoints: 6
+      add_keypoint_distance: 10
+      std_err_xy: 2.5
+      pct_err_z: 0.42
+      max_mse: 10000
+      show_text: True
+      show_features: True
+      feature_size: 2
+      fov_width: 1.094
+      fov_height: 1.094
+      max_face_size: 0.28
+      expand_roi: 1.02
+      flip_image: False
+      keypoint_type: 0 <!-- 0 = Good Features To Track, 1 = SURF -->
+      surf_hessian_quality: 50
+      gf_maxCorners: 200
+      gf_qualityLevel: 0.01
+      gf_minDistance: 7
+      gf_blockSize: 10
+      gf_useHarrisDetector: False
+      gf_k: 0.04
+    </rosparam>
+    
+  	<param name="cascade_frontal_alt" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_frontalface_alt.xml" />
+   	<param name="cascade_frontal_alt2" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_frontalface_alt2.xml" />
+  	<param name="cascade_profile" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_profileface.xml" />
+   	<param name="cascade_upperbody" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_upperbody.xml" />
+   	<param name="cascade_eye" value="$(find rbx_vision)/data/haar_face_detector/haarcascade_eye.xml" />
+
+  </node>
+</launch>

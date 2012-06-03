@@ -14,10 +14,12 @@
   </node>
   
   <!-- Provide simulated control of the robot joint angles -->
+  <!--
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
      <param name="use_gui" value="False" />
      <param name="rate" value="20.0"/>
   </node>
+  -->
     
   <!--
   <node name="pi_robot_arm_down" pkg="rbx_bringup" type="pi_robot_arm_down">
