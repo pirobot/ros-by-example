@@ -30,22 +30,32 @@ from time import sleep
 
 class OutAndBack():
     def __init__(self):
+        # Give the node a name
         rospy.init_node('out_and_back', anonymous=False)
-        
+
+        # Set rospy to exectute a shutdown function when terminating the script        
         rospy.on_shutdown(self.shutdown)
         
         # Publisher to control the robot's speed
         self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)
         
+        # How fast will we update the robot's movement?
         rate = 30
         tick = 1.0 / rate
         
+        # Initialize the forward movement command as an empty Twist message
         move_forward = Twist()
+        
+        # Set the forward linear speed to 0.2 meters per second 
         move_forward.linear.x = 0.2
         
+        # Initialize the rotate command as an empty Twist message
         rotate_left = Twist()
+        
+        # Set the rotation speed to 1.0 radians per second
         rotate_left.angular.z = 1.0
         
+        """ For an out-and-back trajectory, se have to loop through two legs """
         for i in range(2):
             # Move forward for 3 seconds
             ticks = int(3 * rate)
@@ -63,6 +73,7 @@ class OutAndBack():
         self.cmd_vel.publish(Twist())
         
     def shutdown(self):
+        # Always stop the robot when shutting down the node.
         rospy.loginfo("Stopping the robot...")
         self.cmd_vel.publish(Twist())
         rospy.sleep(1)
@@ -71,4 +82,4 @@ if __name__ == '__main__':
     try:
         OutAndBack()
     except rospy.ROSInterruptException:
-        rospy.loginfo("ROS node terminated.")
+        rospy.loginfo("Out-and-Back node terminated.")
