@@ -1,0 +1,6 @@
+image: blank_map.pgm
+resolution: 0.05
+origin: [-10, -10, 0]
+occupied_thresh: 0.65
+free_thresh: 0.25
+negate: 0
