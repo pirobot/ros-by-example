@@ -11,7 +11,7 @@ def is_rect_nonzero(r):
 class CamShiftDemo:
     
     def __init__(self):
-        static_file = "/home/patrick/Dropbox/Robotics/ros/pi-robot-ros-pkg/experimental/ros_by_example/rbx_pi_vision/pi_video_tracker/scripts/test_images/apples_in_field.jpg"
+        static_file = "/home/patrick/Dropbox/Robotics/ros/pi-robot-ros-pkg/experimental/ros_by_example/rbx_pi_vision/pi_video_hbrc_talk/scripts/test_images/apples_in_field.jpg"
         self.static_image = cv.LoadImage(static_file)
         #self.capture = cv.CaptureFromCAM(0)
         cv.NamedWindow( "CamShiftDemo", 1 )

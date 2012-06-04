@@ -82,6 +82,7 @@ class ROS2OpenCV2:
         self.resize_window_width = 640
         self.resize_window_height = 480
         
+        self.pub_roi = True  
         self.show_text = True
 
         # Create the display window
@@ -197,19 +198,24 @@ class ROS2OpenCV2:
                 if self.show_boxes:
                     cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), 1)
             except:
-                x,y,w,h = self.track_box
-                size = w, h
-                center = x + w / 2, y + h / 2
-                pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
-                pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 try:
+                    x,y,w,h = self.track_box
+                    size = w, h
+                    center = x + w / 2, y + h / 2
+                    pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
+                    pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                     cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 1, 8, 0)
                 except:
-                    print pt1, pt2
+                    pass
+
         elif self.detect_box is not None:
             (pt1_x, pt1_y, w, h) = self.detect_box
             if self.show_boxes:
                 cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), 1, 8, 0)
+        
+        """ Publish the ROI """
+        if self.pub_roi:
+            self.publish_roi()
         
         """ Handle keyboard events """
         self.keystroke = cv.WaitKey(5)
@@ -274,18 +280,33 @@ class ROS2OpenCV2:
         
         except CvBridgeError, e:
             print e
+            
+    def publish_roi(self):
+        if not self.drag_start:
+            if self.track_box is not None:
+                roi_box = self.track_box
+            elif self.detect_box is not None:
+                roi_box = self.detect_box
+            else:
+                return
+        else:
+            return
+        
+            
+        roi_box = self.cvBox2D_to_cvRect(roi_box)
+        
+        try:
+            ROI = RegionOfInterest()
+            ROI.x_offset = int(roi_box[0])
+            ROI.y_offset = int(roi_box[1])
+            ROI.width = int(roi_box[2])
+            ROI.height = int(roi_box[3])
+                
+            self.pubROI.publish(ROI)
+        except:
+            pass
           
     def process_image(self, frame): 
-        # Since we aren't applying any filters in this base class, set the ROI to the selected region, if any.
-        if not self.drag_start and not self.detect_box is None:         
-            self.ROI = RegionOfInterest()
-            self.ROI.x_offset = self.detect_box[0]
-            self.ROI.y_offset = self.detect_box[1]
-            self.ROI.width = self.detect_box[2]
-            self.ROI.height = self.detect_box[3]
-            
-        self.pubROI.publish(self.ROI)
-        
         return frame
     
     def display_selection(self):
