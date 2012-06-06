@@ -39,6 +39,8 @@ class MoveBaseSquare():
         
         rospy.on_shutdown(self.shutdown)
         quaternions = list()
+
+        square_size = 1.0 # meters
         
         # The first two target orientations are 90 degrees (horizontal pointing left)
         q_turn_angle = quaternion_from_euler(0, 0, pi / 2, axes='sxyz')
@@ -47,7 +49,9 @@ class MoveBaseSquare():
         q.y = q_turn_angle[1]
         q.z = q_turn_angle[2]
         q.w = q_turn_angle[3]
+        # Append the first turn
         quaternions.append(q)
+        # Append the second turn
         quaternions.append(q)
 
         # The second two target orientations are 270 degrees (horizontal point right)
@@ -57,20 +61,22 @@ class MoveBaseSquare():
         q.y = q_turn_angle[1]
         q.z = q_turn_angle[2]
         q.w = q_turn_angle[3]
+        # Append the third turn
         quaternions.append(q)
+        # Append hte fourth turn
         quaternions.append(q)
 
         
         waypoints = list()
-        waypoints.append(Pose(Point(1.0, 0.0, 0.0), quaternions[0]))
-        waypoints.append(Pose(Point(1.0, 1.0, 0.0), quaternions[1]))
-        waypoints.append(Pose(Point(0.0, 1.0, 0.0), quaternions[2]))
+        waypoints.append(Pose(Point(square_size, 0.0, 0.0), quaternions[0]))
+        waypoints.append(Pose(Point(square_size, square_size, 0.0), quaternions[1]))
+        waypoints.append(Pose(Point(0.0, square_size, 0.0), quaternions[2]))
         waypoints.append(Pose(Point(0.0, 0.0, 0.0), quaternions[3]))
         
-        # Initialize the waypoint markers
+        # Initialize the visualization markers for RViz
         self.init_markers()
         
-        # Set a marker at each location        
+        # Set a visualization marker at each waypoint        
         for waypoint in waypoints:           
             p = Point()
             p = waypoint.position
@@ -94,9 +100,9 @@ class MoveBaseSquare():
             self.goal.target_pose.pose = waypoints[i]
             self.goal.target_pose.header.frame_id = 'map'
             self.goal.target_pose.header.stamp = rospy.Time.now()
-            self.move_base()
+            self.move()
         
-    def move_base(self):
+    def move(self):
             # Start the robot toward the next location
             self.move_base.send_goal(self.goal)
             

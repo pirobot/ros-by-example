@@ -225,7 +225,7 @@ class FaceTracker(ROS2OpenCV2):
                 hscale = 0.4 * self.frame_size[0] / 160. + 0.1
                 vscale = 0.4 * self.frame_size[1] / 120. + 0.1
                 text_font = cv.InitFont(cv.CV_FONT_VECTOR0, hscale, vscale, 0, 1, 8)
-                cv.PutText(self.marker_image, "LOST FACE!", (50, int(self.frame_size[1] * 0.9)), text_font, cv.RGB(255, 255, 0))
+                cv2.putText(self.marker_image, "LOST FACE!", (50, int(self.frame_size[1] * 0.9)), text_font, cv.RGB(255, 255, 0))
             return None
                 
         for (x, y, w, h) in faces:

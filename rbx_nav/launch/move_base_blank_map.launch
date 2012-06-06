@@ -1,5 +1,5 @@
 <launch>
-
+  <!-- Launch move_base and load all navigation parameters -->
   <include file="$(find rbx_nav)/launch/move_base.launch" />
   
   <!-- Run the map server with a blank map -->

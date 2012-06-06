@@ -163,9 +163,9 @@ Robot\:\ Robot\ Model\ Link\ standoff_kinect_1_linkShow\ Axes=0
 Robot\:\ Robot\ Model\ Link\ standoff_kinect_1_linkShow\ Trail=0
 Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
-Camera\ Type=rviz::OrbitViewController
-Camera\ Config=1.1754 4.31677 2.59018 0.298494 0.138416 0.136258
-Property\ Grid\ State=selection=;expanded=Odometry.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=182,364;ispageselected=1
+Camera\ Type=rviz::FixedOrientationOrthoViewController
+Camera\ Config=207.151 -0.551612 1.89665 -0.463182 -0.707107 2.36136e-09 3.68075e-09 0.707107
+Property\ Grid\ State=selection=;expanded=Odometry.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=167,334;ispageselected=1
 [Display0]
 Name=Grid
 Package=rviz

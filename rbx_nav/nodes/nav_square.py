@@ -39,16 +39,16 @@ class NavSquare():
         rospy.on_shutdown(self.shutdown)
         
         # How fast will we check the odometry values?
-        rate = 100
+        rate = 50
         tick = 1.0 / rate
         
         # Set the parameters of our target square
-        square_size = 1.0 # meters
+        square_size = 0.5 # meters
         turn_angle = radians(90) # degrees converted to radians
-        speed_linear = 0.5 # meters per second
-        speed_angular = 1.0 # radians per second
-        tolerance_linear = 0.025 # meters
-        tolerance_angular = radians(2.5) # degrees converted to radians
+        speed_linear = 0.2 # meters per second
+        speed_angular = 0.7 # radians per second
+        tolerance_linear = 0.05 # meters
+        tolerance_angular = radians(10) # degrees converted to radians
         
         # Publisher to control the robot's speed
         self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)

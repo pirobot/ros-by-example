@@ -4,7 +4,7 @@
      rbx_apps
 
   </description>
-  <author>patrick</author>
+  <author>Patrick Goebel</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/rbx_apps</url>
@@ -12,7 +12,7 @@
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
   <depend package="geometry_msgs"/>
-
+  <depend package="tf"/>
 </package>
 
 
