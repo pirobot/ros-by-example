@@ -2,18 +2,12 @@
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find turtlebot_description)/urdf/turtlebot.urdf.xacro'" />
 
   <node name="spawn_turtlebot_model" pkg="gazebo" type="spawn_model" args="$(optenv ROBOT_INITIAL_POSE) -unpause -urdf -param robot_description -model turtlebot" respawn="false" output="screen"/>
-
-  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
-    <rosparam command="load" file="$(find turtlebot_bringup)/config/diagnostics.yaml" />
-  </node>
   
   <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" output="screen">
     <param name="publish_frequency" type="double" value="30.0" />
   </node>
 
-
   <!-- The odometry estimator -->
-
   <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
     <param name="freq" value="30.0"/>
     <param name="sensor_timeout" value="1.0"/>
@@ -48,6 +42,5 @@
     <remap from="cloud" to="/cloud_throttled"/>
     <remap from="scan" to="/narrow_scan"/>
   </node>
-
 
 </launch>

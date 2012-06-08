@@ -44,28 +44,20 @@ class MoveBaseSquare():
         
         # The first two target orientations are 90 degrees (horizontal pointing left)
         q_turn_angle = quaternion_from_euler(0, 0, pi / 2, axes='sxyz')
-        q = Quaternion()
-        q.x = q_turn_angle[0]
-        q.y = q_turn_angle[1]
-        q.z = q_turn_angle[2]
-        q.w = q_turn_angle[3]
+        q = Quaternion(*q_turn_angle)
         # Append the first turn
+        rospy.loginfo(q)
         quaternions.append(q)
         # Append the second turn
         quaternions.append(q)
 
         # The second two target orientations are 270 degrees (horizontal point right)
         q_turn_angle = quaternion_from_euler(0, 0, 3 * pi / 2, axes='sxyz')
-        q = Quaternion()
-        q.x = q_turn_angle[0]
-        q.y = q_turn_angle[1]
-        q.z = q_turn_angle[2]
-        q.w = q_turn_angle[3]
+        q = Quaternion(*q_turn_angle)
         # Append the third turn
         quaternions.append(q)
         # Append hte fourth turn
         quaternions.append(q)
-
         
         waypoints = list()
         waypoints.append(Pose(Point(square_size, 0.0, 0.0), quaternions[0]))

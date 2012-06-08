@@ -17,6 +17,7 @@
   <depend package="visualization_msgs"/>
   <depend package="tf"/>
   <depend package="actionlib"/>
+  <depend package="kdl"/>
 
 </package>
 
