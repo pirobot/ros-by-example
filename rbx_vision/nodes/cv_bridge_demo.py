@@ -40,17 +40,20 @@ class cvBridgeDemo():
         # What we do during shutdown
         rospy.on_shutdown(self.cleanup)
         
-        # Create the display window
+        # Create the OpenCV display window
         self.cv_window_name = self.node_name
         cv.NamedWindow(self.cv_window_name, cv.CV_WINDOW_NORMAL)
-        cv.MoveWindow(self.node_name, 350, 75)
+        cv.MoveWindow(self.cv_window_name, 25, 75)
         
         # Create the cv_bridge object
         self.bridge = CvBridge()
         
-        # Subscribe to the camera image and depth topics and set the appropriate callbacks
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback, queue_size=1)
-        self.depth_sub = rospy.Subscriber("/camera/depth/image_raw", Image, self.depth_callback, queue_size=1)
+        # Subscribe to the camera image and depth topics and set
+        # the appropriate callbacks
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_color",
+                            Image, self.image_callback, queue_size=1)
+        self.depth_sub = rospy.Subscriber("/camera/depth/image_raw",
+                            Image, self.depth_callback, queue_size=1)
         
         rospy.loginfo("Waiting for image topics...")
 
@@ -60,18 +63,20 @@ class cvBridgeDemo():
             frame = self.bridge.imgmsg_to_cv(ros_image, "bgr8")
         except CvBridgeError, e:
             print e
-            
+        
+        # Convert the image to a Numpy array since most cv2 functions
+        # require Numpy arrays.
         frame = np.array(frame, dtype=np.uint8)
         
+        # Process the frame using the process_image() function which returns
+        # and image to display to the user.
         display_image = self.process_image(frame)
-        
-        # Handle keyboard events
-        self.keystroke = cv.WaitKey(5)
-               
+                       
         # Display the image.
         cv2.imshow(self.node_name, display_image)
         
-        #Process any keyboard commands
+        # Process any keyboard commands
+        self.keystroke = cv.WaitKey(5)
         if 32 <= self.keystroke and self.keystroke < 128:
             cc = chr(self.keystroke).lower()
             if cc == 'q':
@@ -81,16 +86,25 @@ class cvBridgeDemo():
     def depth_callback(self, ros_image):
         # Use cv_bridge() to convert the ROS image to OpenCV format
         try:
+            # The depth image is a single-channel float32 image
             depth_image = self.bridge.imgmsg_to_cv(ros_image, "32FC1")
         except CvBridgeError, e:
             print e
 
+        # Convert the depth image to a Numpy array since most cv2 functions
+        # require Numpy arrays.
         depth_array = np.array(depth_image, dtype=np.float32)
-        
+                
+        # Normalize the depth image to fall between 0 (black) and 1 (white)
         cv2.normalize(depth_array, depth_array, 0, 1, cv2.NORM_MINMAX)
         
-        cv2.imshow("Depth Image", depth_array)
-          
+        # Process the depth image
+        depth_display_image = self.process_depth_image(depth_array)
+    
+        # Display the result
+        cv.NamedWindow("Depth Image", cv.CV_WINDOW_NORMAL)
+        cv.MoveWindow("Depth Image", 25, 350)
+        cv2.imshow("Depth Image", depth_display_image)
           
     def process_image(self, frame):
         # Convert to greyscale
@@ -99,10 +113,14 @@ class cvBridgeDemo():
         # Blur the image
         grey = cv2.blur(grey, (7, 7))
         
-        # Compute edges
+        # Compute edges using the Canny edge filter
         edges = cv2.Canny(grey, 15.0, 30.0)
         
         return edges
+    
+    def process_depth_image(self, frame):
+        # Just return the raw image for this demo
+        return frame
     
     def cleanup(self):
         print "Shutting down vision node."

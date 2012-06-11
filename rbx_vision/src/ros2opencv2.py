@@ -131,12 +131,17 @@ class ROS2OpenCV2:
             self.selection = (xmin, ymin, xmax - xmin, ymax - ymin)
             
     def depth_callback(self, data):
+        # Convert the ROS image to OpenCV format using a cv_bridge helper function
         depth_image = self.convert_depth_image(data)
         
         if self.flip_image:    
             depth_image = cv2.flip(depth_image, 0)
-            
-        self.depth_image = depth_image.copy()
+        
+        # Process the depth image
+        processed_depth_image = self.process_depth_image(depth_image)
+        
+        # Make a global copy
+        self.processed_depth_image = processed_depth_image.copy()
 
     def image_callback(self, data):
         # Store the image header in a global variable
@@ -145,7 +150,7 @@ class ROS2OpenCV2:
         # Time this loop to get cycles per second
         start = time.time()
         
-        # Convert the raw image to OpenCV format using cv_bridge helper function
+        # Convert the ROS image to OpenCV format using a cv_bridge helper function
         frame = self.convert_image(data)
         
         # Some webcams invert the image
@@ -306,6 +311,9 @@ class ROS2OpenCV2:
             pass
           
     def process_image(self, frame): 
+        return frame
+    
+    def process_depth_image(self, frame):
         return frame
     
     def display_selection(self):
