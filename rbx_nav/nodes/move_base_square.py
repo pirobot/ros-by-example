@@ -17,7 +17,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details at:
     
-    http://www.gnu.org/licenses/gpl.html
+    http://www.gnu.org/licenses/gpl.htmlPoint
       
 """
 
@@ -25,7 +25,7 @@ import roslib; roslib.load_manifest('rbx_nav')
 import rospy
 import actionlib
 from actionlib_msgs.msg import *
-from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Point, Quaternion, Twist
+from geometry_msgs.msg import Pose, Point, Quaternion, Twist
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from tf.transformations import quaternion_from_euler
 from visualization_msgs.msg import Marker
@@ -33,14 +33,17 @@ from math import radians, pi
 
 class MoveBaseSquare():
     def __init__(self):
-        rospy.init_node('nav_test', anonymous=True)
+        rospy.init_node('nav_test', anonymous=False)
         
         rospy.on_shutdown(self.shutdown)
+        
+        # Create a list to hold the target orientations
         quaternions = list()
 
         square_size = 1.0 # meters
         
-        # The first two target orientations are 90 degrees (horizontal pointing left)
+        # The first two target orientations are 90 degrees
+        # (horizontal pointing left)
         q_turn_angle = quaternion_from_euler(0, 0, pi / 2, axes='sxyz')
         q = Quaternion(*q_turn_angle)
         # Append the first turn
@@ -48,15 +51,20 @@ class MoveBaseSquare():
         # Append the second turn
         quaternions.append(q)
 
-        # The second two target orientations are 270 degrees (horizontal point right)
+        # The second two target orientations are 270 degrees
+        # (horizontal point right)
         q_turn_angle = quaternion_from_euler(0, 0, 3 * pi / 2, axes='sxyz')
         q = Quaternion(*q_turn_angle)
         # Append the third turn
         quaternions.append(q)
-        # Append hte fourth turn
+        # Append the fourth turn
         quaternions.append(q)
         
+        # Create a list to hold the waypoint poses
         waypoints = list()
+        
+        # Append each of the four waypoints to the list.  Each waypoint
+        # is a pose consisting of a position and orientation in the map frame.
         waypoints.append(Pose(Point(square_size, 0.0, 0.0), quaternions[0]))
         waypoints.append(Pose(Point(square_size, square_size, 0.0), quaternions[1]))
         waypoints.append(Pose(Point(0.0, square_size, 0.0), quaternions[2]))
@@ -80,35 +88,54 @@ class MoveBaseSquare():
         rospy.loginfo("Waiting for move_base action server...")
         self.move_base.wait_for_server(rospy.Duration(60))
         rospy.loginfo("Connected to move base server")
-            
+        
         rospy.loginfo("Starting navigation test")
         
-        for i in range(4):
-            self.marker_pub.publish(self.markers)
-            self.goal = MoveBaseGoal()
-            self.goal.target_pose.pose = waypoints[i]
-            self.goal.target_pose.header.frame_id = 'map'
-            self.goal.target_pose.header.stamp = rospy.Time.now()
-            self.move()
+        # Initialize a counter to track waypoints
+        i = 0
         
-    def move(self):
-            # Start the robot toward the next location
-            self.move_base.send_goal(self.goal)
+        # Cycle through each waypoint
+        while i < 4 and not rospy.is_shutdown():
+            # Update the marker display
+            self.marker_pub.publish(self.markers)
+            
+            # Intialize the waypoint goal
+            goal = MoveBaseGoal()
+            
+            # Use the map frame to define goal poses
+            goal.target_pose.header.frame_id = 'map'
+            
+            # Set the time stamp to "now"
+            goal.target_pose.header.stamp = rospy.Time.now()
+            
+            # Set the goal pose to the i-th waypoint
+            goal.target_pose.pose = waypoints[i]
+            
+            # Start the robot moving toward the goal
+            self.move(goal)
+            
+            i += 1
+        
+    def move(self, goal):
+            # Send the goal pose to the MoveBaseAction server
+            self.move_base.send_goal(goal)
             
             # Allow 1 minute to get there
             finished_within_time = self.move_base.wait_for_result(rospy.Duration(60)) 
             
+            # If we don't get there in time, abort the goal
             if not finished_within_time:
                 self.move_base.cancel_goal()
                 rospy.loginfo("Timed out achieving goal")
             else:
+                # We made it!
                 state = self.move_base.get_state()
                 if state == GoalStatus.SUCCEEDED:
                     rospy.loginfo("Goal succeeded!")
                     
     def init_markers(self):
         # Set up our waypoint markers
-        marker_scale = 0.1
+        marker_scale = 0.15
         marker_lifetime = 0 # 0 is forever
         marker_ns = 'waypoints'
         marker_id = 0
@@ -121,7 +148,7 @@ class MoveBaseSquare():
         self.markers = Marker()
         self.markers.ns = marker_ns
         self.markers.id = marker_id
-        self.markers.type = Marker.CUBE_LIST
+        self.markers.type = Marker.SPHERE_LIST
         self.markers.action = Marker.ADD
         self.markers.lifetime = rospy.Duration(marker_lifetime)
         self.markers.scale.x = marker_scale
@@ -137,8 +164,10 @@ class MoveBaseSquare():
 
     def shutdown(self):
         rospy.loginfo("Stopping the robot...")
+        # Cancel any active goals
         self.move_base.cancel_goal()
         rospy.sleep(2)
+        # Stop the robot
         self.cmd_vel_pub.publish(Twist())
         rospy.sleep(1)
 
@@ -147,3 +176,4 @@ if __name__ == '__main__':
         MoveBaseSquare()
     except rospy.ROSInterruptException:
         rospy.loginfo("Navigation test finished.")
+

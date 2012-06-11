@@ -54,7 +54,9 @@ class OutAndBack():
         # Set the rotation speed to 1.0 radians per second
         rotate_left.angular.z = 1.0
         
+        # Initialize a loop counter
         i = 0
+
         # Loop once for each leg of the trip
         while i < 2 and not rospy.is_shutdown():
             # Move forward for 5 seconds (approx 1 meter)
