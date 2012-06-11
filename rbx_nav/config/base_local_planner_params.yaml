@@ -1,38 +1,47 @@
-controller_frequency: 20.0
+controller_frequency: 5.0
 #planner_patience: 5.0
 #controller_patience: 5.0
 recovery_behavior_enabled: false
 clearing_rotation_allowed: false
 
 TrajectoryPlannerROS:
-  max_vel_x: 0.5
-  min_vel_x: 0.2
+  max_vel_x: 0.2
+  min_vel_x: 0.1
   max_rotational_vel: 1.2
-  min_in_place_rotational_vel: 0.4
+  
+  # Real robot
+  min_in_place_rotational_vel: 0.8
   escape_vel: -0.10
-  acc_lim_th: 2.0
-  acc_lim_x: 1.0
-  acc_lim_y: 1.0
+  acc_lim_th: 0.75
+  acc_lim_x: 0.5
+  acc_lim_y: 0.5
+  
+  # Simulation
+  #min_in_place_rotational_vel: 0.4
+  #escape_vel: -0.10
+  #acc_lim_th: 2.0
+  #acc_lim_x: 1.0
+  #acc_lim_y: 1.0
 
   holonomic_robot: false
-  yaw_goal_tolerance: 0.2 # about 11 degrees
-  xy_goal_tolerance: 0.1 # 10 cm
+  yaw_goal_tolerance: 0.3 # about 11 degrees
+  xy_goal_tolerance: 0.15 # 10 cm
   goal_distance_bias: 0.6
-  path_distance_bias: 1.5
+  path_distance_bias: 0.8
 
-  heading_lookahead: 0.325
-  meter_scoring: false
+  heading_lookahead: 1.0
+  meter_scoring: true
   heading_scoring: false
   oscillation_reset_dist: 0.05
   occdist_scale: 0.05
   publish_cost_grid_pc: false
 
-  sim_time: 1.0
+  sim_time: 3.5
   sim_granularity: 0.1
   angular_sim_granularity: 0.1
-  vx_samples: 6
+  vx_samples: 8
   vtheta_samples: 20
-  dwa: true
+  dwa: false
   
   
 

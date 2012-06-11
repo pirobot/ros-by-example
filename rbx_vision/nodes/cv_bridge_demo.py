@@ -22,8 +22,7 @@
       
 """
 
-import roslib
-roslib.load_manifest('rbx_vision')
+import roslib; roslib.load_manifest('rbx_vision')
 import rospy
 import sys
 import cv2

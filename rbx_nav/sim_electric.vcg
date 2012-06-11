@@ -1,6 +1,6 @@
-Background\ ColorR=0.690196
-Background\ ColorG=0.690196
-Background\ ColorB=0.690196
+Background\ ColorR=0.12549
+Background\ ColorG=0.12549
+Background\ ColorB=0.12549
 Fixed\ Frame=/odom
 Target\ Frame=<Fixed Frame>
 GlobalPlan.Alpha=1
@@ -22,9 +22,9 @@ Goal\ Pose.Shape=0
 Goal\ Pose.Topic=/move_base/current_goal
 Grid.Alpha=0.5
 Grid.Cell\ Size=0.5
-Grid.ColorR=0
-Grid.ColorG=0
-Grid.ColorB=0
+Grid.ColorR=0.941176
+Grid.ColorG=0.941176
+Grid.ColorB=0.941176
 Grid.Enabled=1
 Grid.Line\ Style=0
 Grid.Line\ Width=0.03
@@ -165,7 +165,7 @@ Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::FixedOrientationOrthoViewController
 Camera\ Config=207.151 -0.551612 1.89665 -0.463182 -0.707107 2.36136e-09 3.68075e-09 0.707107
-Property\ Grid\ State=selection=;expanded=Odometry.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=167,334;ispageselected=1
+Property\ Grid\ State=selection=Background Color;expanded=.Global Options,Odometry.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=133,266;ispageselected=1
 [Display0]
 Name=Grid
 Package=rviz

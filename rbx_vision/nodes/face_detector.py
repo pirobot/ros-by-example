@@ -5,8 +5,7 @@
     Based on the OpenCV facedetect.py demo code 
 """
 
-import roslib
-roslib.load_manifest('rbx_vision')
+import roslib; roslib.load_manifest('rbx_vision')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 import sys
@@ -124,17 +123,18 @@ class FaceDetector(ROS2OpenCV2):
             if self.cascade_profile:
                 faces = self.cascade_profile.detectMultiScale(search_image, scaleFactor=self.scale_factor, minNeighbors=self.min_neighbors, minSize=self.min_size, flags = self.haar_flags)
 
-#        """ If that fails, check a different frontal profile """
-#        if not len(faces):
-#            faces = self.cascade_frontal_alt.detectMultiScale(search_image, scaleFactor=self.scale_factor, minNeighbors=self.min_neighbors, minSize=self.min_size, flags = self.haar_flags)
+        """ If that fails, check a different frontal profile """
+        if not len(faces):
+            if self.cascade_frontal_alt:
+                faces = self.cascade_frontal_alt.detectMultiScale(search_image, scaleFactor=self.scale_factor, minNeighbors=self.min_neighbors, minSize=self.min_size, flags = self.haar_flags)
 
-            if not len(faces):
-                self.last_face_box = None
-                if self.show_text:
-                    font_face = cv2.FONT_HERSHEY_SIMPLEX
-                    font_scale = 0.5
-                    cv2.putText(self.marker_image, "LOST FACE!", (20, int(self.frame_size[1] * 0.9)), font_face, font_scale, cv.RGB(255, 50, 50))
-                return None
+        if not len(faces):
+            self.last_face_box = None
+            if self.show_text:
+                font_face = cv2.FONT_HERSHEY_SIMPLEX
+                font_scale = 0.5
+                cv2.putText(self.marker_image, "LOST FACE!", (20, int(self.frame_size[1] * 0.9)), font_face, font_scale, cv.RGB(255, 50, 50))
+            return None
             
         if self.show_text:
             font_face = cv2.FONT_HERSHEY_SIMPLEX

@@ -5,8 +5,7 @@
     Based on the OpenCV lk_track.py demo code 
 """
 
-import roslib
-roslib.load_manifest('rbx_vision')
+import roslib; roslib.load_manifest('rbx_vision')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 import sys

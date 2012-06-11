@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/env python
 
 """ nav_square.py - Version 0.1 2012-03-24
 
@@ -21,9 +21,7 @@
       
 """
 
-import roslib
-roslib.load_manifest('rbx_nav')
-
+import roslib; roslib.load_manifest('rbx_nav')
 import rospy
 from geometry_msgs.msg import Twist, Quaternion
 from nav_msgs.msg import Odometry

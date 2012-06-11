@@ -7,7 +7,6 @@
 
 import roslib; roslib.load_manifest('rbx_speech')
 import rospy
-
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
 from math import copysign

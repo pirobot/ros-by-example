@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """ move_base_square.py - Version 0.1 2012-01-10
 
@@ -21,9 +21,7 @@
       
 """
 
-import roslib
-roslib.load_manifest('rbx_nav')
-
+import roslib; roslib.load_manifest('rbx_nav')
 import rospy
 import actionlib
 from actionlib_msgs.msg import *
@@ -46,7 +44,6 @@ class MoveBaseSquare():
         q_turn_angle = quaternion_from_euler(0, 0, pi / 2, axes='sxyz')
         q = Quaternion(*q_turn_angle)
         # Append the first turn
-        rospy.loginfo(q)
         quaternions.append(q)
         # Append the second turn
         quaternions.append(q)

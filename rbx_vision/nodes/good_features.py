@@ -5,8 +5,7 @@
     Locate the Good Features To Track in a video stream.
 """
 
-import roslib
-roslib.load_manifest('rbx_vision')
+import roslib; roslib.load_manifest('rbx_vision')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 import sys

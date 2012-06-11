@@ -27,6 +27,6 @@ joints: {
 }
 
 controllers: {
-   #  Pololu motors: 1856 cpr = 0.3888105m travel = 4773 ticks per meter (empirical: 4534)
-   base_controller: {type: diff_controller, base_frame_id: base_link, base_width: 0.249, ticks_meter: 4534, Kp: 12, Kd: 12, Ki: 0, Ko: 50, accel_limit: 1.0 }
+   #  Pololu motors: 1856 cpr = 0.3888105m travel = 4773 ticks per meter (empirical: 4100)
+   base_controller: {type: diff_controller, base_frame_id: base_link, base_width: 0.26, ticks_meter: 4100, Kp: 12, Kd: 12, Ki: 0, Ko: 50, accel_limit: 1.0 }
 }

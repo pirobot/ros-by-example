@@ -21,9 +21,7 @@
       
 """
 
-import roslib
-roslib.load_manifest('rbx_nav')
-
+import roslib; roslib.load_manifest('rbx_nav')
 import rospy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
@@ -40,15 +38,15 @@ class NavSquare():
         
         # How fast will we check the odometry values?
         rate = 50
-        tick = 1.0 / rate
+        r = rospy.Rate(rate)
         
         # Set the parameters of our target square
-        square_size = 0.5 # meters
-        turn_angle = radians(90) # degrees converted to radians
-        speed_linear = 0.2 # meters per second
-        speed_angular = 0.7 # radians per second
-        tolerance_linear = 0.05 # meters
-        tolerance_angular = radians(10) # degrees converted to radians
+        square_size = rospy.get_param("~square_size", 1.0) # meters
+        turn_angle = rospy.get_param("~turn_angle", radians(90)) # degrees converted to radians
+        speed_linear = rospy.get_param("~speed_linear", 0.2) # meters per second
+        speed_angular = rospy.get_param("~speed_angular", 0.7) # radians per second
+        tolerance_linear = rospy.get_param("~tolerance_linear", 0.02) # meters
+        tolerance_angular = rospy.get_param("~tolerance_angular", radians(2)) # degrees converted to radians
         
         # Publisher to control the robot's speed
         self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)
@@ -56,7 +54,8 @@ class NavSquare():
         # Variable to hold the current odometry values
         self.odom = Odometry()
         
-        # Subscribe to the /odom topic to get odometry data.  Set the callback to the self.odom_update function.
+        # Subscribe to the /odom topic to get odometry data.
+        # Set the callback to the self.odom_update function.
         rospy.Subscriber('/odom', Odometry, self.update_odom)
         
         # Wait for the /odom topic to become available
@@ -74,12 +73,20 @@ class NavSquare():
             y_start = odom_start.pose.pose.position.y
             
             """ First move along a side """
+            # Initialize the movement command
             move_cmd = Twist()
+            
+            # Intialize a flag to indicate whether or not we have reached the goal
             waypoint_success = False
             
+            # Enter the loop to move along a side
             while not waypoint_success and not rospy.is_shutdown():
-                # Compute the Euclidean distance from the target point
-                error = sqrt(pow((x_start - self.odom.pose.pose.position.x), 2) +  pow((y_start - self.odom.pose.pose.position.y), 2)) - square_size
+                # Compute the Euclidean distance from the start
+                distance = sqrt(pow((x_start - self.odom.pose.pose.position.x), 2)
+                            + pow((y_start - self.odom.pose.pose.position.y), 2))
+                
+                # How close are we to the goal?
+                error = distance - square_size
                 
                 # Are we close enough?
                 if abs(error) <  tolerance_linear:
@@ -88,7 +95,7 @@ class NavSquare():
                     # If not, move in the appropriate direction
                     move_cmd.linear.x = copysign(speed_linear, -1 * error)                
                     self.cmd_vel.publish(move_cmd)
-                    rospy.sleep(tick)
+                    r.sleep()
 
             # Stop the robot before rotating
             move_cmd = Twist()
@@ -96,23 +103,41 @@ class NavSquare():
             waypoint_success = False
             
             """ Now rotate 90 degrees """
-            # Get the starting orientation
-            orientation = euler_from_quaternion([self.odom.pose.pose.orientation.x, self.odom.pose.pose.orientation.y, self.odom.pose.pose.orientation.z, self.odom.pose.pose.orientation.w], axes='sxyz')
-            start_angle = orientation[2]
+            # Get the starting orientation as a quaternion from the odometry data
+            q = [self.odom.pose.pose.orientation.x,
+                self.odom.pose.pose.orientation.y,
+                self.odom.pose.pose.orientation.z,
+                self.odom.pose.pose.orientation.w]
             
-            # The euler angles jump from 180 to -180 so we have to do some adjustment to compensate
+            # Convert the quaternion to Euler angles
+            euler_angles = euler_from_quaternion(q, axes='sxyz')
+            
+            # Rotation about the z axis is the the third value (index 2)
+            start_angle = euler_angles[2]
+            
+            # The Euler angles jump from 180 to -180 so we
+            # have to do some adjustment to compensate
             if start_angle < 0:
                 start_angle = 2 * pi + start_angle
             
-            # Set the target angle modulo 360 degrees    
+            # Set the target angle modulo 360 degrees to handle wrap around
             target_angle = (start_angle + turn_angle) % (2 * pi)
             
             while not waypoint_success and not rospy.is_shutdown():
-                # Get the current orientation
-                orientation = euler_from_quaternion([self.odom.pose.pose.orientation.x, self.odom.pose.pose.orientation.y, self.odom.pose.pose.orientation.z, self.odom.pose.pose.orientation.w], axes='sxyz')
-                current_angle = orientation[2]
+                # Get the current orientation as a quaternion
+                q = [self.odom.pose.pose.orientation.x,
+                    self.odom.pose.pose.orientation.y,
+                    self.odom.pose.pose.orientation.z,
+                    self.odom.pose.pose.orientation.w]
                 
-                # The euler angles jump from 180 to -180 so we have to do some adjustment to compensate
+                # Convert to Euler angles
+                euler_angles = euler_from_quaternion(q, axes='sxyz')
+                
+                # Get the rotation around the z-axis
+                current_angle = euler_angles[2]
+                
+                # The Euler angles jump from 180 to -180 so we have to
+                # do some adjustment to compensate
                 if current_angle < 0:
                     current_angle = 2 * pi + current_angle
                 
@@ -130,7 +155,7 @@ class NavSquare():
                     # If not, rotate in the appropriate direction
                     move_cmd.angular.z = copysign(speed_angular, -1 * error)                
                     self.cmd_vel.publish(move_cmd)
-                    rospy.sleep(tick)
+                    r.sleep()
 
         # Stop the robot.
         self.cmd_vel.publish(Twist())
@@ -149,3 +174,4 @@ if __name__ == '__main__':
         NavSquare()
     except rospy.ROSInterruptException:
         rospy.loginfo("Navigation terminated.")
+

@@ -4,8 +4,7 @@
 
 """
 
-import roslib
-roslib.load_manifest('pi_video_tracker')
+import roslib; roslib.load_manifest('pi_video_tracker')
 import rospy
 from ros2opencv2 import ROS2OpenCV2
 from sensor_msgs.msg import Image, RegionOfInterest
