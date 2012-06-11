@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- the -r option for gazebo disables ogre, therefore, no graphics card is needed.  However, no image generation is possible. -->
+  <!-- start gazebo with an empty plane -->
+  <param name="/use_sim_time" value="true" />
+
+  <node name="gazebo" pkg="gazebo" type="gazebo" args="-r $(find rbx_gazebo)/worlds/empty.world" respawn="false" output="screen"/>
+
+</launch>

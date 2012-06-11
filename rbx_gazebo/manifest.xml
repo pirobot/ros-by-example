@@ -1,0 +1,16 @@
+<package>
+  <description brief="rbx_gazebo">
+
+     rbx_gazebo
+
+  </description>
+  <author>Patrick Goebel</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rbx_gazebo</url>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+
+</package>
+
+

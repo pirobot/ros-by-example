@@ -1,0 +1,65 @@
+Background\ ColorR=0.101961
+Background\ ColorG=0.101961
+Background\ ColorB=0.101961
+Fixed\ Frame=/skeleton/openni_depth_frame
+Target\ Frame=<Fixed Frame>
+Grid.Alpha=0.5
+Grid.Cell\ Size=0.2
+Grid.ColorR=0.5
+Grid.ColorG=0.5
+Grid.ColorB=0.5
+Grid.Enabled=1
+Grid.Line\ Style=0
+Grid.Line\ Width=0.03
+Grid.Normal\ Cell\ Count=0
+Grid.OffsetX=0
+Grid.OffsetY=0
+Grid.OffsetZ=0
+Grid.Plane=0
+Grid.Plane\ Cell\ Count=40
+Grid.Reference\ Frame=<Fixed Frame>
+Markers.Enabled=0
+Markers.Marker\ Topic=/skeleton_markers
+TF.All\ Enabled=1
+TF.Enabled=1
+TF.Frame\ Timeout=15
+TF.Marker\ Scale=1
+TF.Show\ Arrows=0
+TF.Show\ Axes=1
+TF.Show\ Names=0
+TF.Update\ Interval=0
+Tool\ 2D\ Nav\ GoalTopic=move_base_simple/goal
+Tool\ 2D\ Pose\ EstimateTopic=initialpose
+Camera\ Type=rviz::OrbitViewController
+Camera\ Config=1.2354 1.3004 2.6592 0.11434 -0.134238 0.364532
+Property\ Grid\ State=selection=TF.Enabled;expanded=.Global Options,TF.Enabled,TF./skeleton/head_2/skeleton/head_2,TF./skeleton/left_elbow_2/skeleton/left_elbow_2,TF./skeleton/left_foot_2/skeleton/left_foot_2,TF./skeleton/left_hand_2/skeleton/left_hand_2,TF./skeleton/left_hip_2/skeleton/left_hip_2,TF./skeleton/left_knee_2/skeleton/left_knee_2,TF./skeleton/left_shoulder_2/skeleton/left_shoulder_2,TF./skeleton/neck_2/skeleton/neck_2,TF./skeleton/openni_depth_frame/skeleton/openni_depth_frame,TF./skeleton/right_elbow_2/skeleton/right_elbow_2,TF./skeleton/right_foot_2/skeleton/right_foot_2,TF./skeleton/right_hand_2/skeleton/right_hand_2,TF./skeleton/right_hip_2/skeleton/right_hip_2,TF./skeleton/right_knee_2/skeleton/right_knee_2,TF./skeleton/right_shoulder_2/skeleton/right_shoulder_2,TF./skeleton/torso_2/skeleton/torso_2,TF.Enabled.TF.Tree,TF./skeleton/openni_depth_frameTree/skeleton/openni_depth_frame,TF./skeleton/right_elbow_2Tree/skeleton/right_elbow_2,TF./skeleton/right_foot_2Tree/skeleton/right_foot_2,TF./skeleton/right_hand_2Tree/skeleton/right_hand_2,TF./skeleton/right_hip_2Tree/skeleton/right_hip_2,TF./skeleton/right_knee_2Tree/skeleton/right_knee_2,TF./skeleton/right_shoulder_2Tree/skeleton/right_shoulder_2,TF./skeleton/torso_2Tree/skeleton/torso_2,TF./skeleton/head_2Tree/skeleton/head_2,TF./skeleton/left_elbow_2Tree/skeleton/left_elbow_2,TF./skeleton/left_foot_2Tree/skeleton/left_foot_2,TF./skeleton/left_hand_2Tree/skeleton/left_hand_2,TF./skeleton/left_hip_2Tree/skeleton/left_hip_2,TF./skeleton/left_knee_2Tree/skeleton/left_knee_2,TF./skeleton/left_shoulder_2Tree/skeleton/left_shoulder_2,TF./skeleton/neck_2Tree/skeleton/neck_2,Markers.Enabled.Markers.Namespaces;scrollpos=0,0;splitterpos=167,334;ispageselected=1
+[Display0]
+Name=Grid
+Package=rviz
+ClassName=rviz::GridDisplay
+[Display1]
+Name=TF
+Package=rviz
+ClassName=rviz::TFDisplay
+[Display2]
+Name=Markers
+Package=rviz
+ClassName=rviz::MarkerDisplay
+[TF.]
+[TF./skeleton]
+head_2Enabled=1
+left_elbow_2Enabled=1
+left_foot_2Enabled=1
+left_hand_2Enabled=1
+left_hip_2Enabled=1
+left_knee_2Enabled=1
+left_shoulder_2Enabled=1
+neck_2Enabled=1
+openni_depth_frameEnabled=1
+right_elbow_2Enabled=1
+right_foot_2Enabled=1
+right_hand_2Enabled=1
+right_hip_2Enabled=1
+right_knee_2Enabled=1
+right_shoulder_2Enabled=1
+torso_2Enabled=1
