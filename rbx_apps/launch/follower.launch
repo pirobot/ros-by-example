@@ -2,12 +2,5 @@
   <node pkg="rbx_apps" name="follower" type="follower.py" output="screen">
     <remap from="camera_info" to="/camera/rgb/camera_info" />
     <remap from="point_cloud" to="/camera/rgb/points" />
-    
-    <rosparam>
-       rate: 10
-       max_rotation_speed: 2.0
-       angular_threshold: 20
-       k_angular: 1.5
-    </rosparam>
   </node>
 </launch>

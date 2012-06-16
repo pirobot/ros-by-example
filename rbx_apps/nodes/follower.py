@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-    person_follower.py - Version 1.0 2012-06-01
+    follower.py - Version 1.0 2012-06-01
     
     Follow a "person" by tracking the nearest object in x-y-z space.
     
@@ -34,9 +34,9 @@ import point_cloud2 as pc
 from math import copysign
 #from pointclouds import pointcloud2_to_array, get_xyz_points
 
-class PersonFollower():
+class Follower():
     def __init__(self):
-        rospy.init_node("person_follower")
+        rospy.init_node("follower")
         
         # Set the shutdown function (stop the robot)
         rospy.on_shutdown(self.shutdown)
@@ -120,9 +120,9 @@ class PersonFollower():
             pt_z = point[2]
             
             if -pt_y > self.min_y and -pt_y < self.max_y and  pt_x < self.max_x and pt_x > self.min_x and pt_z < self.max_z:
-                x += point[0]
-                y += point[1]
-                z += point[2]
+                x += pt_x
+                y += pt_y
+                z += pt_z
                 n += 1
             
         #t = cv.GetTickCount() - t
@@ -160,7 +160,7 @@ class PersonFollower():
                    
 if __name__ == '__main__':
     try:
-        PersonFollower()
+        Follower()
         rospy.spin()
     except rospy.ROSInterruptException:
         rospy.loginfo("Follower node terminated.")
