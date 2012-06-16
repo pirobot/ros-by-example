@@ -100,7 +100,7 @@ class ROS2OpenCV2:
         self.image_sub = rospy.Subscriber("input_rgb_image", Image, self.image_callback, queue_size=1)
         self.depth_sub = rospy.Subscriber("input_depth_image", Image, self.depth_callback, queue_size=1)
         
-        rospy.loginfo("Waiting for video topic(s)...")
+        rospy.loginfo("Starting node " + str(node_name))
                     
     def on_mouse_click(self, event, x, y, flags, param):
         """ We will usually use the mouse to select points to track or to draw a rectangle
@@ -293,11 +293,16 @@ class ROS2OpenCV2:
                 roi_box = self.detect_box
             else:
                 return
-        else:
+                #roi_box = [0, 0, 0, 0]       
+        try:
+            roi_box = self.cvBox2D_to_cvRect(roi_box)
+        except:
             return
+            #roi_box = [0, 0, 0, 0]
         
-            
-        roi_box = self.cvBox2D_to_cvRect(roi_box)
+        # Watch out for negative offsets
+        roi_box[0] = max(0, roi_box[0])
+        roi_box[1] = max(0, roi_box[1])
         
         try:
             ROI = RegionOfInterest()
@@ -305,10 +310,9 @@ class ROS2OpenCV2:
             ROI.y_offset = int(roi_box[1])
             ROI.width = int(roi_box[2])
             ROI.height = int(roi_box[3])
-                
             self.pubROI.publish(ROI)
         except:
-            pass
+            rospy.loginfo("Publishing ROI failed")
           
     def process_image(self, frame): 
         return frame
@@ -348,11 +352,11 @@ class ROS2OpenCV2:
                 (center, size, angle) = roi
                 pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-                rect = (pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1])
+                rect = [pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1]]
             else:
-                rect = roi
+                rect = list(roi)
         except:
-            return None
+            return [0, 0, 0, 0]
             
         return rect
         
@@ -369,7 +373,7 @@ class ROS2OpenCV2:
         except:
             return None
             
-        return box2d
+        return list(box2d)
         
     def cleanup(self):
         print "Shutting down vision node."

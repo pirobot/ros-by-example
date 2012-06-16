@@ -4,8 +4,9 @@
     <rosparam>
        rate: 10
        max_rotation_speed: 2.0
-       angular_threshold: 10
-       k_angular: 2.5
+       min_rotation_speed: 0.5
+       angular_threshold: 0.1
+       gain: 2.0
     </rosparam>
   </node>
 </launch>

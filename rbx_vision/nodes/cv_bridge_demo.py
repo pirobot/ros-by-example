@@ -40,10 +40,14 @@ class cvBridgeDemo():
         # What we do during shutdown
         rospy.on_shutdown(self.cleanup)
         
-        # Create the OpenCV display window
+        # Create the OpenCV display window for the RGB image
         self.cv_window_name = self.node_name
         cv.NamedWindow(self.cv_window_name, cv.CV_WINDOW_NORMAL)
         cv.MoveWindow(self.cv_window_name, 25, 75)
+        
+        # And one for the depth image
+        cv.NamedWindow("Depth Image", cv.CV_WINDOW_NORMAL)
+        cv.MoveWindow("Depth Image", 25, 350)
         
         # Create the cv_bridge object
         self.bridge = CvBridge()
@@ -102,8 +106,6 @@ class cvBridgeDemo():
         depth_display_image = self.process_depth_image(depth_array)
     
         # Display the result
-        cv.NamedWindow("Depth Image", cv.CV_WINDOW_NORMAL)
-        cv.MoveWindow("Depth Image", 25, 350)
         cv2.imshow("Depth Image", depth_display_image)
           
     def process_image(self, frame):

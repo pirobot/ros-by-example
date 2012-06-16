@@ -299,7 +299,7 @@ class FaceTracker(ROS2OpenCV2):
         
     
 def main(args):
-      FT = FaceTracker("face_tracker")
+      FaceTracker("face_tracker")
       try:
         rospy.spin()
       except KeyboardInterrupt:

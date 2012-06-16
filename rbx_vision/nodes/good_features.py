@@ -94,7 +94,7 @@ class GoodFeatures(ROS2OpenCV2):
                 cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)    
 
 def main(args):
-      GF = GoodFeatures("good_features")
+      GoodFeatures("good_features")
       try:
         rospy.spin()
       except KeyboardInterrupt:
@@ -103,4 +103,3 @@ def main(args):
 
 if __name__ == '__main__':
     main(sys.argv)
-    

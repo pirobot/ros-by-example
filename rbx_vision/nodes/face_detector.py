@@ -210,7 +210,7 @@ def trunc(f, n):
     return float(str(f)[:slen])
     
 def main(args):
-      FD = FaceDetector("face_detector")
+      FaceDetector("face_detector")
       try:
         rospy.spin()
       except KeyboardInterrupt:
@@ -219,4 +219,3 @@ def main(args):
 
 if __name__ == '__main__':
     main(sys.argv)
-    
