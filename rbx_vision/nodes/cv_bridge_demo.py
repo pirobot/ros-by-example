@@ -72,8 +72,7 @@ class cvBridgeDemo():
         # require Numpy arrays.
         frame = np.array(frame, dtype=np.uint8)
         
-        # Process the frame using the process_image() function which returns
-        # and image to display to the user.
+        # Process the frame using the process_image() function
         display_image = self.process_image(frame)
                        
         # Display the image.
@@ -129,14 +128,13 @@ class cvBridgeDemo():
         cv2.destroyAllWindows()   
     
 def main(args):       
-    # Fire up the node.
-    cvBridgeDemo()
-    
     try:
+        cvBridgeDemo()
         rospy.spin()
     except KeyboardInterrupt:
-        print "Shutting down ros2opencv node."
+        print "Shutting down vision node."
         cv.DestroyAllWindows()
 
 if __name__ == '__main__':
     main(sys.argv)
+    

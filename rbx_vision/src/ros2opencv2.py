@@ -200,7 +200,7 @@ class ROS2OpenCV2:
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 #cv.Rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 2, 8, 0)
                 if self.show_boxes:
-                    cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), 1)
+                    cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), 2)
             except:
                 try:
                     x,y,w,h = self.track_box
@@ -208,14 +208,14 @@ class ROS2OpenCV2:
                     center = x + w / 2, y + h / 2
                     pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                     pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 1, 8, 0)
+                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 2, 8, 0)
                 except:
                     pass
 
         elif self.detect_box is not None:
             (pt1_x, pt1_y, w, h) = self.detect_box
             if self.show_boxes:
-                cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), 1, 8, 0)
+                cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), 2, 8, 0)
         
         """ Publish the ROI """
         if self.pub_roi:

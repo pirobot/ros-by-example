@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
 """
-  voice_nav.py allows controlling a mobile base using simple speech commands.
+  voice_nav.py
+  
+  Allows controlling a mobile base using simple speech commands.
+  
   Based on the voice_cmd_vel.py script by Michael Ferguson in the pocketsphinx ROS package.
+  
+  See http://www.ros.org/wiki/pocketsphinx
 """
 
 import roslib; roslib.load_manifest('rbx_speech')

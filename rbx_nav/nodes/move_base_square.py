@@ -37,13 +37,13 @@ class MoveBaseSquare():
         
         rospy.on_shutdown(self.shutdown)
         
+        # How big is the square we want the robot to navigate?
+        square_size = rospy.get_param("~square_size", 1.0) # meters
+        
         # Create a list to hold the target orientations
         quaternions = list()
-
-        square_size = 1.0 # meters
         
         # The first two target orientations are 90 degrees
-        # (horizontal pointing left)
         q_turn_angle = quaternion_from_euler(0, 0, pi / 2, axes='sxyz')
         q = Quaternion(*q_turn_angle)
         # Append the first turn
@@ -52,7 +52,6 @@ class MoveBaseSquare():
         quaternions.append(q)
 
         # The second two target orientations are 270 degrees
-        # (horizontal point right)
         q_turn_angle = quaternion_from_euler(0, 0, 3 * pi / 2, axes='sxyz')
         q = Quaternion(*q_turn_angle)
         # Append the third turn
@@ -86,15 +85,17 @@ class MoveBaseSquare():
         self.move_base = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         
         rospy.loginfo("Waiting for move_base action server...")
-        self.move_base.wait_for_server(rospy.Duration(60))
-        rospy.loginfo("Connected to move base server")
         
+        # Wait 60 seconds for the action server to become available
+        self.move_base.wait_for_server(rospy.Duration(60))
+        
+        rospy.loginfo("Connected to move base server")
         rospy.loginfo("Starting navigation test")
         
         # Initialize a counter to track waypoints
         i = 0
         
-        # Cycle through each waypoint
+        # Cycle through the four waypoints
         while i < 4 and not rospy.is_shutdown():
             # Update the marker display
             self.marker_pub.publish(self.markers)
@@ -176,4 +177,3 @@ if __name__ == '__main__':
         MoveBaseSquare()
     except rospy.ROSInterruptException:
         rospy.loginfo("Navigation test finished.")
-

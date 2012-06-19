@@ -40,7 +40,7 @@ class NavSquare():
         rate = 50
         r = rospy.Rate(rate)
         
-        # Set the parameters of our target square
+        # Set the parameters for the target square
         square_size = rospy.get_param("~square_size", 1.0) # meters
         turn_angle = rospy.get_param("~turn_angle", radians(90)) # degrees converted to radians
         speed_linear = rospy.get_param("~speed_linear", 0.2) # meters per second
@@ -76,7 +76,7 @@ class NavSquare():
             # Initialize the movement command
             move_cmd = Twist()
             
-            # Intialize a flag to indicate whether or not we have reached the goal
+            # A flag indicating when we have reached a waypoint
             waypoint_success = False
             
             # Enter the loop to move along a side
@@ -103,7 +103,7 @@ class NavSquare():
             waypoint_success = False
             
             """ Now rotate 90 degrees """
-            # Get the starting orientation as a quaternion from the odometry data
+            # Get the starting orientation as a quaternion
             q = [self.odom.pose.pose.orientation.x,
                 self.odom.pose.pose.orientation.y,
                 self.odom.pose.pose.orientation.z,
@@ -112,7 +112,7 @@ class NavSquare():
             # Convert the quaternion to Euler angles
             euler_angles = euler_from_quaternion(q, axes='sxyz')
             
-            # Rotation about the z axis is the the third value (index 2)
+            # The third value (index 2) is the rotation about the z axis
             start_angle = euler_angles[2]
             
             # The Euler angles jump from 180 to -180 so we
@@ -123,6 +123,7 @@ class NavSquare():
             # Set the target angle modulo 360 degrees to handle wrap around
             target_angle = (start_angle + turn_angle) % (2 * pi)
             
+            # Do the rotation
             while not waypoint_success and not rospy.is_shutdown():
                 # Get the current orientation as a quaternion
                 q = [self.odom.pose.pose.orientation.x,
@@ -157,7 +158,7 @@ class NavSquare():
                     self.cmd_vel.publish(move_cmd)
                     r.sleep()
 
-        # Stop the robot.
+        # Stop the robot when we are done
         self.cmd_vel.publish(Twist())
         
     def update_odom(self, msg):
