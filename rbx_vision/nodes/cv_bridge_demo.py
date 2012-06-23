@@ -56,6 +56,7 @@ class cvBridgeDemo():
         # the appropriate callbacks
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color",
                             Image, self.image_callback, queue_size=1)
+        
         self.depth_sub = rospy.Subscriber("/camera/depth/image_raw",
                             Image, self.depth_callback, queue_size=1)
         

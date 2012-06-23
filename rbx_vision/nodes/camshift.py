@@ -8,45 +8,48 @@
 
 import roslib; roslib.load_manifest('rbx_vision')
 import rospy
-import sys
-from cv2 import cv as cv
 import cv2
+from cv2 import cv as cv
 from ros2opencv2 import ROS2OpenCV2
 from std_msgs.msg import String
-from sensor_msgs.msg import Image, RegionOfInterest, CameraInfo
+from sensor_msgs.msg import Image
 import numpy as np
 
 class CamShiftNode(ROS2OpenCV2):
     def __init__(self, node_name):
         ROS2OpenCV2.__init__(self, node_name)
-        
+
         self.node_name = node_name
         
+        # The minimum saturation of the tracked color in HSV space,
+        # as well as the min and max value (the V in HSV) and a 
+        # threshold on the backprojection probability image.
         self.smin = rospy.get_param("~smin", 85)
         self.vmin = rospy.get_param("~vmin", 50)
         self.vmax = rospy.get_param("~vmax", 254)
         self.threshold = rospy.get_param("~threshold", 50)
-               
-        self.ROI = rospy.Publisher("roi", RegionOfInterest)
-        
+                       
+        # Create a number of windows for displaying the histogram,
+        # parameters controls, and backprojection image
         cv.NamedWindow("Histogram", cv.CV_WINDOW_NORMAL)
         cv.MoveWindow("Histogram", 700, 50)
-        
-        """ Subscribe to the raw camera image topic """
-        self.image_sub = rospy.Subscriber("input", Image, self.image_callback)
-        
         cv.NamedWindow("Parameters", 0)
+        cv.MoveWindow("Parameters", 700, 325)
+        cv.NamedWindow("Backproject", 0)
+        cv.MoveWindow("Backproject", 700, 600)
+        
+        # Create the slider controls for saturation, value and threshold
         cv.CreateTrackbar("Saturation", "Parameters", self.smin, 255, self.set_smin)
         cv.CreateTrackbar("Min Value", "Parameters", self.vmin, 255, self.set_vmin)
         cv.CreateTrackbar("Max Value", "Parameters", self.vmax, 255, self.set_vmax)
         cv.CreateTrackbar("Threshold", "Parameters", self.threshold, 255, self.set_threshold)
         
+        # Initialize a number of variables
         self.hist = None
         self.track_window = None
         self.show_backproj = False
-        
-        self.frame_number = 0
-        
+    
+    # These are the callbacks for the slider controls
     def set_smin(self, pos):
         self.smin = pos
         
@@ -59,11 +62,19 @@ class CamShiftNode(ROS2OpenCV2):
     def set_threshold(self, pos):
         self.threshold = pos
 
+    # The main processing function computes the histogram and backprojection
     def process_image(self, cv_image):
+        # First blue the image
         frame = cv2.blur(cv_image, (5, 5))
+        
+        # Convert from RGB to HSV spave
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        
+        # Create a mask using the current saturation and value parameters
         mask = cv2.inRange(hsv, np.array((0., self.smin, self.vmin)), np.array((180., 255., self.vmax)))
         
+        # If the user is making a selection with the mouse, 
+        # calculate a new histogram to track
         if self.selection is not None:
             x0, y0, w, h = self.selection
             x1 = x0 + w
@@ -79,21 +90,28 @@ class CamShiftNode(ROS2OpenCV2):
         if self.detect_box is not None:
             self.selection = None
         
+        # If we have a histogram, tracking it with CamShift
         if self.hist is not None:
-            self.frame_number += 1
+            # Compute the backprojection from the histogram
             backproject = cv2.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
+            
+            # Mask the backprojection with the mask created earlier
             backproject &= mask
-            #kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5), (2, 2))
-            #backproject = cv2.erode(backproject, kernel)
-            #backproject = cv2.dilate(backproject, kernel)
+
+            # Threshold the backprojection
             ret, backproject = cv2.threshold(backproject, self.threshold, 255, cv.CV_THRESH_TOZERO)
-            #moments = cv2.moments(backproject)
-            term_crit = ( cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1 )
+
             x, y, w, h = self.track_window
             if self.track_window is None or w <= 0 or h <=0:
                 self.track_window = 0, 0, self.frame_width - 1, self.frame_height - 1
             
+            # Set the criteria for the CamShift algorithm
+            term_crit = ( cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1 )
+            
+            # Run the CamShift algorithm
             self.track_box, self.track_window = cv2.CamShift(backproject, self.track_window, term_crit)
+            
+            # Display the resulting backprojection
             cv2.imshow("Backproject", backproject)
 
         return cv_image
@@ -131,15 +149,16 @@ class CamShiftNode(ROS2OpenCV2):
             return histimg
          
 
-def main(args):
-      cs = CamShiftNode("camshift")
-      try:
+if __name__ == '__main__':
+    try:
+        node_name = "camshift"
+        CamShiftNode(node_name)
+        try:
+            rospy.init_node(node_name)
+        except:
+            pass
         rospy.spin()
-      except KeyboardInterrupt:
+    except KeyboardInterrupt:
         print "Shutting down vision node."
         cv.DestroyAllWindows()
 
-if __name__ == '__main__':
-    main(sys.argv)
-    
-    

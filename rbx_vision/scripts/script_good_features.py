@@ -15,7 +15,7 @@ if __name__ == '__main__':
     import sys
     try: fn1 = sys.argv[1]
     except:
-        fn1 = "test_images/mona_lisa.png"
+        fn1 = "test_images/mona_lisa_face.png"
         
     print help_message
     
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     gf_params = dict( maxCorners = 200, 
                    qualityLevel = 0.1,
                    minDistance = 7,
-                   blockSize = 10,
+                   blockSize = 20,
                    useHarrisDetector = False,
                    k = 0.04 )
 
@@ -40,5 +40,5 @@ if __name__ == '__main__':
 
     
     print "Elapsed time:", 1000 * (clock() - start), "milliseconds"
-    cv2.imshow("GoodFeaturesToTrack", img)
+    cv2.imshow("Keypoints", img)
     cv2.waitKey()

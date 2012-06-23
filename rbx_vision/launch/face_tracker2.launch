@@ -10,7 +10,6 @@
     
     <rosparam>
       use_haar_only: False
-      use_depth_for_detection: False
       use_depth_for_tracking: False
       auto_min_keypoints: True
       min_keypoints: 20
@@ -21,14 +20,11 @@
       max_mse: 10000
       show_text: True
       show_features: True
-      feature_size: 2
+      feature_size: 1
       fov_width: 1.094
       fov_height: 1.094
       max_face_size: 0.28
       expand_roi: 1.02
-      flip_image: False
-      keypoint_type: 0 <!-- 0 = Good Features To Track, 1 = SURF -->
-      surf_hessian_quality: 50
       gf_maxCorners: 200
       gf_qualityLevel: 0.01
       gf_minDistance: 7
@@ -37,11 +33,9 @@
       gf_k: 0.04
     </rosparam>
     
-  	<param name="cascade_frontal_alt" value="$(find rbx_vision)/data/haar_detectors/haarcascade_frontalface_alt.xml" />
-   	<param name="cascade_frontal_alt2" value="$(find rbx_vision)/data/haar_detectors/haarcascade_frontalface_alt2.xml" />
-  	<param name="cascade_profile" value="$(find rbx_vision)/data/haar_detectors/haarcascade_profileface.xml" />
-   	<param name="cascade_upperbody" value="$(find rbx_vision)/data/haar_detectors/haarcascade_upperbody.xml" />
-   	<param name="cascade_eye" value="$(find rbx_vision)/data/haar_detectors/haarcascade_eye.xml" />
+   	<param name="cascade_1" value="$(find rbx_vision)/data/haar_detectors/haarcascade_frontalface_alt2.xml" />
+  	<param name="cascade_2" value="$(find rbx_vision)/data/haar_detectors/haarcascade_frontalface_alt.xml" />
+  	<param name="cascade_3" value="$(find rbx_vision)/data/haar_detectors/haarcascade_profileface.xml" />
 
   </node>
 </launch>

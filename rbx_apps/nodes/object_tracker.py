@@ -3,7 +3,7 @@
 """
     object_tracker.py - Version 1.0 2012-06-01
     
-    Rotate the robot left or right to center a target published on the /roi topic.
+    Rotate the robot left or right to follow a target published on the /roi topic.
     
     Created for the Pi Robot Project: http://www.pirobot.org
     Copyright (c) 2012 Patrick Goebel.  All rights reserved.
@@ -66,7 +66,7 @@ class ObjectTracker():
         rospy.wait_for_message('camera_info', CameraInfo)
         
         # Subscribe the camera_info topic to get the image width and height
-        rospy.Subscriber('camera_info', CameraInfo, self.getCameraInfo)
+        rospy.Subscriber('camera_info', CameraInfo, self.get_camera_info)
 
         # Wait until we actually have the camera data
         while self.image_width == 0 or self.image_height == 0:
@@ -75,8 +75,9 @@ class ObjectTracker():
         rospy.loginfo("Image size: " + str(self.image_width) + " x " + str(self.image_height))
         
         # Subscribe to the ROI topic and set the callback to update the robot's motion
-        rospy.Subscriber('roi', RegionOfInterest, self.setCmdVel)
+        rospy.Subscriber('roi', RegionOfInterest, self.set_cmd_vel)
         
+        # Wait until we have an ROI to follow
         rospy.wait_for_message('roi', RegionOfInterest)
         
         # Begin the tracking loop
@@ -87,7 +88,7 @@ class ObjectTracker():
             # Sleep for 1/self.rate seconds
             r.sleep()
     
-    def setCmdVel(self, msg):
+    def set_cmd_vel(self, msg):
         # If the ROI was lost (msg.width=0), stop the robot
         if msg.width == 0:
             self.move_cmd = Twist()
@@ -117,7 +118,7 @@ class ObjectTracker():
             # Otherwise stop the robot
             self.move_cmd = Twist()
             
-    def getCameraInfo(self, msg):
+    def get_camera_info(self, msg):
         self.image_width = msg.width
         self.image_height = msg.height
         

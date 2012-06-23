@@ -4,15 +4,14 @@
     <remap from="input_rgb_image" to="/camera/rgb/image_color" />
     
     <rosparam>
-       show_text: True
        maxCorners: 200
        qualityLevel: 0.01
        minDistance: 7
        blockSize: 10
        useHarrisDetector: False
        k: 0.04
-       feature_size: 2
-       flip_image: False
+       feature_size: 1
+       show_text: True
     </rosparam>
     
   </node>

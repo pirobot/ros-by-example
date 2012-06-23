@@ -40,19 +40,23 @@ import numpy as np
 
 class ROS2OpenCV2:
     def __init__(self, node_name):
+        self.node_name = node_name
+
         rospy.init_node(node_name)
         
         rospy.on_shutdown(self.cleanup)
         
-        self.node_name = node_name
+        # A number of parameters to determine what gets displayed on the
+        # screen.  These can be overridden the appropriate launch file
         self.show_text = rospy.get_param("~show_text", True)
         self.show_features = rospy.get_param("~show_features", True)
         self.show_boxes = rospy.get_param("~show_boxes", True)
         self.flip_image = rospy.get_param("~flip_image", False)
+        self.feature_size = rospy.get_param("~feature_size", False)
 
         # Initialize the Region of Interest and its publisher
         self.ROI = RegionOfInterest()
-        self.pubROI = rospy.Publisher("/roi", RegionOfInterest)
+        self.roi_pub = rospy.Publisher("/roi", RegionOfInterest)
         
         # Initialize a number of global variables
         self.frame = None
@@ -81,10 +85,7 @@ class ROS2OpenCV2:
         self.resize_window_width = 640
         self.resize_window_height = 480
         
-        self.pub_roi = True  
-        self.show_text = True
-
-        # Create the display window
+        # Create the main display window
         self.cv_window_name = self.node_name
         cv.NamedWindow(self.cv_window_name, cv.CV_WINDOW_NORMAL)
         if self.resize_window_height > 0 and self.resize_window_width > 0:
@@ -93,24 +94,21 @@ class ROS2OpenCV2:
         # Create the cv_bridge object
         self.bridge = CvBridge()
         
-        """ Set a call back on mouse clicks on the image window """
+        # Set a call back on mouse clicks on the image window
         cv.SetMouseCallback (self.node_name, self.on_mouse_click, None)
         
         # Subscribe to the image and depth topics and set the appropriate callbacks
+        # The image topic names can be remapped in the appropriate launch file
         self.image_sub = rospy.Subscriber("input_rgb_image", Image, self.image_callback, queue_size=1)
         self.depth_sub = rospy.Subscriber("input_depth_image", Image, self.depth_callback, queue_size=1)
         
         rospy.loginfo("Starting node " + str(node_name))
-                    
+                            
     def on_mouse_click(self, event, x, y, flags, param):
-        """ We will usually use the mouse to select points to track or to draw a rectangle
-            around a region of interest. """
+        # This function allows the user to selection a ROI using the mouse
         if self.frame is None:
             return
         
-        #if self.frame.origin:
-            #y = self.frame.height - y
-            
         if event == cv.CV_EVENT_LBUTTONDOWN and not self.drag_start:
             self.features = []
             self.track_box = None
@@ -134,6 +132,7 @@ class ROS2OpenCV2:
         # Convert the ROS image to OpenCV format using a cv_bridge helper function
         depth_image = self.convert_depth_image(data)
         
+        # Some webcams invert the image
         if self.flip_image:    
             depth_image = cv2.flip(depth_image, 0)
         
@@ -156,7 +155,8 @@ class ROS2OpenCV2:
         # Some webcams invert the image
         if self.flip_image:
             frame = cv2.flip(frame, 0)
-            
+        
+        # Store the frame width and height in a pair of global variables
         if self.frame_width is None:
             self.frame_size = (frame.shape[1], frame.shape[0])
             self.frame_width, self.frame_height = self.frame_size            
@@ -186,13 +186,14 @@ class ROS2OpenCV2:
         # Display the user-selection rectangle or point 
         self.display_selection()
         
+        # Night mode: only display the markers
         if self.night_mode:
-            # Night mode: only display the markers
             self.processed_image = np.zeros_like(self.processed_image)
             
         # Merge the processed image and the marker image
         self.display_image = cv2.bitwise_or(self.processed_image, self.marker_image)
 
+        # If we have a track box, then display it
         if self.track_box is not None:
             try:
                 (center, size, angle) = self.track_box
@@ -200,7 +201,7 @@ class ROS2OpenCV2:
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 #cv.Rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 2, 8, 0)
                 if self.show_boxes:
-                    cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), 2)
+                    cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), self.feature_size)
             except:
                 try:
                     x,y,w,h = self.track_box
@@ -208,22 +209,23 @@ class ROS2OpenCV2:
                     center = x + w / 2, y + h / 2
                     pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                     pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 2, 8, 0)
+                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), self.feature_size, 8, 0)
                 except:
                     pass
 
+        # Otherwise, if we have a detect box then display it
         elif self.detect_box is not None:
             (pt1_x, pt1_y, w, h) = self.detect_box
             if self.show_boxes:
-                cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), 2, 8, 0)
+                cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), self.feature_size, 8, 0)
         
-        """ Publish the ROI """
-        if self.pub_roi:
-            self.publish_roi()
+        # Publish the ROI
+        self.publish_roi()
         
-        """ Handle keyboard events """
+        # Handle keyboard events
         self.keystroke = cv.WaitKey(5)
             
+        # Compute the time for this loop and estimate CPS as a running average
         end = time.time()
         duration = end - start
         fps = int(1.0 / duration)
@@ -232,6 +234,7 @@ class ROS2OpenCV2:
             self.cps_values.pop(0)
         self.cps = int(sum(self.cps_values) / len(self.cps_values))
         
+        # Display CPS and image resolution if asked to
         if self.show_text:
             font_face = cv2.FONT_HERSHEY_SIMPLEX
             font_scale = 0.5
@@ -249,10 +252,10 @@ class ROS2OpenCV2:
             cv2.putText(self.display_image, "CPS: " + str(self.cps), (10, vstart), font_face, font_scale, cv.RGB(255, 255, 0))
             cv2.putText(self.display_image, "RES: " + str(self.frame_size[0]) + "X" + str(self.frame_size[1]), (10, voffset), font_face, font_scale, cv.RGB(255, 255, 0))
         
-        # Now display the image.
+        # Update the image display
         cv2.imshow(self.node_name, self.display_image)
         
-        """ Process any keyboard commands """
+        # Process any keyboard commands
         if 32 <= self.keystroke and self.keystroke < 128:
             cc = chr(self.keystroke).lower()
             if cc == 'n':
@@ -264,7 +267,7 @@ class ROS2OpenCV2:
             elif cc == 't':
                 self.show_text = not self.show_text
             elif cc == 'q':
-                """ user has press the q key, so exit """
+                # The has press the q key, so exit
                 rospy.signal_shutdown("User hit q key to quit.")      
           
     def convert_image(self, ros_image):
@@ -293,12 +296,10 @@ class ROS2OpenCV2:
                 roi_box = self.detect_box
             else:
                 return
-                #roi_box = [0, 0, 0, 0]       
         try:
             roi_box = self.cvBox2D_to_cvRect(roi_box)
         except:
             return
-            #roi_box = [0, 0, 0, 0]
         
         # Watch out for negative offsets
         roi_box[0] = max(0, roi_box[0])
@@ -310,7 +311,7 @@ class ROS2OpenCV2:
             ROI.y_offset = int(roi_box[1])
             ROI.width = int(roi_box[2])
             ROI.height = int(roi_box[3])
-            self.pubROI.publish(ROI)
+            self.roi_pub.publish(ROI)
         except:
             rospy.loginfo("Publishing ROI failed")
           
@@ -324,14 +325,14 @@ class ROS2OpenCV2:
         # If the user is selecting a region with the mouse, display the corresponding rectangle for feedback.
         if self.drag_start and self.is_rect_nonzero(self.selection):
             x,y,w,h = self.selection
-            cv2.rectangle(self.marker_image, (x, y), (x + w, y + h), (0, 255, 255), 2)
+            cv2.rectangle(self.marker_image, (x, y), (x + w, y + h), (0, 255, 255), self.feature_size)
             self.selected_point = None
 
         # Else if the user has clicked on a point on the image, display it as a small circle.            
         elif not self.selected_point is None:
             x = self.selected_point[0]
             y = self.selected_point[1]
-            cv2.circle(self.marker_image, (x, y), 3, (0, 255, 255), 2)
+            cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 255), self.feature_size)
         
     def is_rect_nonzero(self, rect):
         # First assume a simple CvRect type
@@ -379,16 +380,11 @@ class ROS2OpenCV2:
         print "Shutting down vision node."
         cv2.destroyAllWindows()       
 
-def main(args):
-    # Display a help message if appropriate.
-    help_message = ""
-          
-    print help_message
-          
-    # Fire up the node.
-    ROS2OpenCV2("ros2opencv2")
-    
+def main(args):    
     try:
+        node_name = "ros2opencv2"
+        ROS2OpenCV2(node_name)
+        rospy.loginfo("Starting node " + str(node_name))
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down ros2opencv node."

@@ -7,99 +7,102 @@
 
 import roslib; roslib.load_manifest('rbx_vision')
 import rospy
-from ros2opencv2 import ROS2OpenCV2
-import sys
 import cv2
 import cv2.cv as cv
+from ros2opencv2 import ROS2OpenCV2
 import numpy as np
 
 class GoodFeatures(ROS2OpenCV2):
-    def __init__(self, node_name):
+    def __init__(self, node_name): 
         ROS2OpenCV2.__init__(self, node_name)
-        
-        self.node_name = node_name
-        
+          
+        # Do we should text on the display?
         self.show_text = rospy.get_param("~show_text", True)
+        
+        # How big should the feature points be (in pixels)?
         self.feature_size = rospy.get_param("~feature_size", 1)
         
         # Good features parameters
-        self.maxCorners = rospy.get_param("~maxCorners", 200)
-        self.qualityLevel = rospy.get_param("~qualityLevel", 0.01)
-        self.minDistance = rospy.get_param("~minDistance", 7)
-        self.blockSize = rospy.get_param("~blockSize", 10)
-        self.useHarrisDetector = rospy.get_param("~useHarrisDetector", False)
-        self.k = rospy.get_param("~k", 0.04)
-        self.flip_image = rospy.get_param("~flip_image", False)
+        self.gf_maxCorners = rospy.get_param("~gf_maxCorners", 200)
+        self.gf_qualityLevel = rospy.get_param("~gf_qualityLevel", 0.001)
+        self.gf_minDistance = rospy.get_param("~gf_minDistance", 7)
+        self.gf_blockSize = rospy.get_param("~gf_blockSize", 5)
+        self.gf_useHarrisDetector = rospy.get_param("~gf_useHarrisDetector", True)
+        self.gf_k = rospy.get_param("~gf_k", 0.04)
         
-        self.gf_params = dict( maxCorners = self.maxCorners, 
-                       qualityLevel = self.qualityLevel,
-                       minDistance = self.minDistance,
-                       blockSize = self.blockSize,
-                       useHarrisDetector = self.useHarrisDetector,
-                       k = self.k )
+        # Store all parameters together for passing to the detector
+        self.gf_params = dict(maxCorners = self.gf_maxCorners, 
+                       qualityLevel = self.gf_qualityLevel,
+                       minDistance = self.gf_minDistance,
+                       blockSize = self.gf_blockSize,
+                       useHarrisDetector = self.gf_useHarrisDetector,
+                       k = self.gf_k)
 
-        self.detect_interval = 1
-        self.features = []
-        self.frame_idx = 0
-
+        # Initialize key variables
+        self.keypoints = list()
         self.detect_box = None
         self.mask = None
         
-
     def process_image(self, cv_image):
+        # If the user has not selected a region, just return the image
         if not self.detect_box:
             return cv_image
 
         # Create a greyscale version of the image
-        self.grey = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
-
-        """ Redetect features at the given interval """        
-        if self.frame_idx % self.detect_interval == 0:
-            self.keypoints = []
-            self.get_keypoints(self.detect_box)
+        grey = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         
-        # Process any special keyboard commands for this module
+        # Equalize the histogram to reduce lighting effects
+        grey = cv2.equalizeHist(grey)
+
+        # Get the good feature keypoints in the selected region
+        keypoints = self.get_keypoints(grey, self.detect_box)
+        
+        # If we have points, display them
+        if keypoints is not None and len(keypoints) > 0:
+            for x, y in keypoints:
+                cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)
+        
+        # Process any special keyboard commands
         if 32 <= self.keystroke and self.keystroke < 128:
             cc = chr(self.keystroke).lower()
             if cc == 'c':
-                self.keypoints = []
+                # Clear the current keypoints
+                keypoints = list()
                 self.detect_box = None
-                
-        self.frame_idx += 1
-                
+                                
         return cv_image
 
-    def get_keypoints(self, detect_box):
-        """ Zero the mask with all black pixels """
-        self.mask = np.zeros_like(self.grey)
+    def get_keypoints(self, input_image, detect_box):
+        # Initialize the mask with all black pixels
+        self.mask = np.zeros_like(input_image)
  
-        """ Get the coordinates and dimensions of the track box """
+        # Get the coordinates and dimensions of the detect_box
         try:
-            x,y,w,h = detect_box
+            x, y, w, h = detect_box
         except: 
             return None
-
-        """ For manually selected regions, just use a rectangle """
-        pt1 = (x, y)
-        pt2 = (x + w, y + h)
         
-        """ Set the rectangule within the mask to white """
+        # Set the selected rectangle within the mask to white
         self.mask[y:y+h, x:x+w] = 255
 
-        p = cv2.goodFeaturesToTrack(self.grey, mask = self.mask, **self.gf_params)
-        
-        if p is not None:
-            for x, y in np.float32(p).reshape(-1, 2):
-                self.keypoints.append([(x, y)])
-                cv2.circle(self.marker_image, (x, y), self.feature_size, (0, 255, 0, 0), cv.CV_FILLED, 8, 0)    
-
-def main(args):
-      GoodFeatures("good_features")
-      try:
-        rospy.spin()
-      except KeyboardInterrupt:
-        print "Shutting down the Good Features node."
-        cv.DestroyAllWindows()
+        # Compute the good feature keypoints within the selected region
+        keypoints = list()
+        kp = cv2.goodFeaturesToTrack(input_image, mask = self.mask, **self.gf_params)
+        if kp is not None and len(kp) > 0:
+            for x, y in np.float32(kp).reshape(-1, 2):
+                keypoints.append((x, y))
+                
+        return keypoints
 
 if __name__ == '__main__':
-    main(sys.argv)
+    try:
+        node_name = "good_features"
+        GoodFeatures(node_name)
+        try:
+            rospy.init_node(node_name)
+        except:
+            pass
+        rospy.spin()
+    except KeyboardInterrupt:
+        print "Shutting down the Good Features node."
+        cv.DestroyAllWindows()
