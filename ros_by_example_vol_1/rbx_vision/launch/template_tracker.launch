@@ -14,7 +14,7 @@
       max_object_size: 0.28
     </rosparam>
     
-  	<param name="template_file" value="$(find rbx_vision)/models/templates/faces/mona_live/Template_0.png" />
+  	<param name="template_file" value="$(find rbx_vision)/data/templates/faces/mona_live/Template_0.png" />
 
   </node>
 </launch>

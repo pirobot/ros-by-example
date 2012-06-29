@@ -25,7 +25,6 @@ import roslib; roslib.load_manifest('rbx_apps')
 import rospy
 from sensor_msgs.msg import RegionOfInterest, CameraInfo
 from geometry_msgs.msg import Twist
-from math import copysign
 
 class ObjectTracker():
     def __init__(self):
@@ -33,6 +32,10 @@ class ObjectTracker():
                 
         # Set the shutdown function (stop the robot)
         rospy.on_shutdown(self.shutdown)
+        
+        # How often should we update the robot's motion?
+        self.rate = rospy.get_param("~rate", 10)
+        r = rospy.Rate(self.rate) 
         
         # The maximum rotation speed in radians per second
         self.max_rotation_speed = rospy.get_param("~max_rotation_speed", 2.0)
@@ -44,12 +47,9 @@ class ObjectTracker():
         # can lead to oscillations of the robot.
         self.gain = rospy.get_param("~gain", 2.0)
         
-        # How often should we update our response to object motion?
-        self.rate = rospy.get_param("~rate", 10)
-        r = rospy.Rate(self.rate) 
-        
-        # The pan threshold (% of image width) indicates how far off-center the ROI needs to be before we react
-        self.angular_threshold = rospy.get_param("~angular_threshold", 0.1)
+        # The x threshold (% of image width) indicates how far off-center
+        # the ROI needs to be in the x-direction before we react
+        self.x_threshold = rospy.get_param("~x_threshold", 0.1)
 
         # Publisher to control the robot's movement
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist)
@@ -61,6 +61,9 @@ class ObjectTracker():
         self.image_width = 0
         self.image_height = 0
         
+        # Set flag to indicate when the ROI stops updating
+        self.target_visible = False
+        
         # Wait for the camera_info topic to become available
         rospy.loginfo("Waiting for camera_info topic...")
         rospy.wait_for_message('camera_info', CameraInfo)
@@ -71,69 +74,73 @@ class ObjectTracker():
         # Wait until we actually have the camera data
         while self.image_width == 0 or self.image_height == 0:
             rospy.sleep(1)
-            
-        rospy.loginfo("Image size: " + str(self.image_width) + " x " + str(self.image_height))
-        
+                    
         # Subscribe to the ROI topic and set the callback to update the robot's motion
         rospy.Subscriber('roi', RegionOfInterest, self.set_cmd_vel)
         
         # Wait until we have an ROI to follow
         rospy.wait_for_message('roi', RegionOfInterest)
         
+        rospy.loginfo("ROI messages detected. Starting tracker...")
+        
         # Begin the tracking loop
         while not rospy.is_shutdown():
-            # Send the latest Twist command to the robot
+            # If the target is not visible, stop the robot
+            if not self.target_visible:
+                self.move_cmd = Twist()
+            else:
+                # Reset the flag to False by default
+                self.target_visible = False
+                
+            # Send the Twist command to the robot
             self.cmd_vel_pub.publish(self.move_cmd)
             
             # Sleep for 1/self.rate seconds
             r.sleep()
-    
+
     def set_cmd_vel(self, msg):
-        # If the ROI was lost (msg.width=0), stop the robot
-        if msg.width == 0:
-            self.move_cmd = Twist()
-            return
-        
-        # Compute the center of the ROI based on the x_offset and image width
-        angular_offset = msg.x_offset + (msg.width / 2.0) - (self.image_width / 2.0)
-        
+        # If the ROI stops updating this next statement will not happen
+        self.target_visible = True
+
+        # Compute the displacement of the ROI from the center of the image
+        target_offset_x = msg.x_offset + msg.width / 2 - self.image_width / 2
+
         try:
-            percent_offset = abs(float(angular_offset) / float(self.image_width))
+            percent_offset_x = float(target_offset_x) / (float(self.image_width) / 2.0)
         except:
-            percent_offset = 0
-                              
-        # Pan the camera only if the displacement of the COG exceeds the threshold
-        if percent_offset > self.angular_threshold:
+            percent_offset_x = 0
+
+        # Rotate the robot only if the displacement of the target exceeds the threshold
+        if abs(percent_offset_x) > self.x_threshold:
             # Set the rotation speed proportional to the displacement of the target
             try:
-                speed = self.gain * angular_offset / (self.image_width / 2.0)
+                speed = self.gain * percent_offset_x
+                rospy.loginfo(speed)
                 if speed < 0:
                     direction = -1
                 else:
                     direction = 1
-                self.move_cmd.angular.z = -direction * max(self.min_rotation_speed, min(self.max_rotation_speed, abs(speed)))
+                self.move_cmd.angular.z = -direction * max(self.min_rotation_speed,
+                                            min(self.max_rotation_speed, abs(speed)))
             except:
                 self.move_cmd = Twist()
         else:
             # Otherwise stop the robot
             self.move_cmd = Twist()
-            
+
     def get_camera_info(self, msg):
         self.image_width = msg.width
         self.image_height = msg.height
-        
+
     def shutdown(self):
         rospy.loginfo("Stopping the robot...")
         self.cmd_vel_pub.publish(Twist())
         rospy.sleep(1)     
-                   
+
 if __name__ == '__main__':
     try:
         ObjectTracker()
         rospy.spin()
     except rospy.ROSInterruptException:
         rospy.loginfo("Object tracking node terminated.")
-
-
-
 

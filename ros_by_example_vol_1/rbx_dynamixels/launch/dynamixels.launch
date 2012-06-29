@@ -1,0 +1,49 @@
+<launch>	
+    <!-- Load the URDF/Xacro model of our robot -->
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find rbx_dynamixels)/urdf/pi_turtlebot.xacro'" />
+
+    <!-- Publish the robot state -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+    	<param name="publish_frequency" value="20.0"/>
+    </node>
+
+   <!-- Start the Dynamixel low-level driver manager with parameters -->
+   <node name="dynamixel_manager" pkg="dynamixel_controllers"
+      type="controller_manager.py" required="true" output="screen">
+      <rosparam>
+         namespace: turtlebot_dynamixel_manager
+         serial_ports:
+            dynamixel_ax12:
+               port_name: "/dev/ttyUSB1"
+               baud_rate: 1000000
+               min_motor_id:  1
+               max_motor_id: 2
+               update_rate: 20
+      </rosparam>
+   </node>
+   
+    <!-- Load joint controller configuration from YAML file to parameter server -->
+    <rosparam file="$(find rbx_dynamixels)/config/dynamixel_params.yaml" command="load"/>
+
+   <!-- Start the head pan and tilt controllers -->
+   <node name="dynamixel_controller_spawner_ax12" pkg="dynamixel_controllers"
+   type="controller_spawner.py"
+        args="--manager=turtlebot_dynamixel_manager
+              --port=dynamixel_ax12
+              --type=simple
+        head_pan_controller
+        head_tilt_controller"
+        output="screen" />
+        
+   <!-- Publish fake wheel states for the TurtleBot -->
+   <node name="fake_pub" pkg="rbx_dynamixels" type="fake_pub.py" />
+
+   <!-- Start the Dynamixel Joint States Publisher -->
+   <node name="dynamixel_joint_states_publisher" pkg="rbx_dynamixels" type="dynamixel_joint_state_publisher.py" output="screen" />
+
+   <!-- Start all Dynamixels in the relaxed state -->
+   <node pkg="rbx_dynamixels" type="relax_all_servos.py" name="relax_all_servos" />
+  
+   <!-- Publish a static transform between the robot base and the world frame -->
+   <node pkg="tf" type="static_transform_publisher" name="world_base_broadcaster" args="0 0 0.0325 0 0 0 /world /base_link 100" />
+</launch>

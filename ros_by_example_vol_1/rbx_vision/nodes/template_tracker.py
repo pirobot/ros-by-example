@@ -105,8 +105,7 @@ class TemplateTracker(ROS2OpenCV2):
             return False
 
     
-    def match_template(self, cv_image):
-        frame = np.array(cv_image, dtype=np.uint8)
+    def match_template(self, frame):
         
         H,W = frame.shape[0], frame.shape[1]
         h,w = self.template.shape[0], self.template.shape[1]
@@ -187,21 +186,22 @@ class TemplateTracker(ROS2OpenCV2):
         h = int(h * best_s)
         w = int(w * best_s)
         best_result = cv2.resize(best_result, (int(pow(2.0, self.n_pyr)) * best_result.shape[1], int(pow(2.0, self.n_pyr)) * best_result.shape[0]))
-        cv2.imshow("Result", best_result)
+        display_result = np.abs(best_result)**3
+
+        cv2.imshow("Result", display_result)
         best_template = cv2.resize(best_template, (int(pow(2.0, self.n_pyr)) * best_template.shape[1], int(pow(2.0, self.n_pyr)) * best_template.shape[0]))
         cv2.imshow("Best Template", best_template)
         
         #match_box = ((best_x + w/2, best_y + h/2), (w, h), -best_r)
         return (best_x, best_y, w, h)
 
-def main(args):
-    PMT = TemplateTracker("template_tracker")
+if __name__ == '__main__':
     try:
-      rospy.spin()
+        node_name = "template_tracker"
+        TemplateTracker(node_name)
+        rospy.spin()
     except KeyboardInterrupt:
       print "Shutting down fast match template node."
       cv.DestroyAllWindows()
 
-if __name__ == '__main__':
-    main(sys.argv)
     

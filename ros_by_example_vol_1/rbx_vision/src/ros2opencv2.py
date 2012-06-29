@@ -38,12 +38,15 @@ from cv_bridge import CvBridge, CvBridgeError
 import time
 import numpy as np
 
-class ROS2OpenCV2:
+class ROS2OpenCV2(object):
     def __init__(self, node_name):
+        super(ROS2OpenCV2, self).__init__()
+        
         self.node_name = node_name
 
         rospy.init_node(node_name)
-        
+        rospy.loginfo("Starting node " + str(node_name))
+
         rospy.on_shutdown(self.cleanup)
         
         # A number of parameters to determine what gets displayed on the
@@ -78,7 +81,7 @@ class ROS2OpenCV2:
         self.keep_marker_history = False
         self.night_mode = False
         self.auto_face_tracking = False
-        self.cps = 0 # Cylces per second = number of processing loops per second.
+        self.cps = 0 # Cycles per second = number of processing loops per second.
         self.cps_values = list()
         self.cps_n_values = 20
         self.busy = False
@@ -99,11 +102,9 @@ class ROS2OpenCV2:
         
         # Subscribe to the image and depth topics and set the appropriate callbacks
         # The image topic names can be remapped in the appropriate launch file
-        self.image_sub = rospy.Subscriber("input_rgb_image", Image, self.image_callback, queue_size=1)
-        self.depth_sub = rospy.Subscriber("input_depth_image", Image, self.depth_callback, queue_size=1)
-        
-        rospy.loginfo("Starting node " + str(node_name))
-                            
+        self.image_sub = rospy.Subscriber("input_rgb_image", Image, self.image_callback)
+        self.depth_sub = rospy.Subscriber("input_depth_image", Image, self.depth_callback)
+                                    
     def on_mouse_click(self, event, x, y, flags, param):
         # This function allows the user to selection a ROI using the mouse
         if self.frame is None:
@@ -384,7 +385,6 @@ def main(args):
     try:
         node_name = "ros2opencv2"
         ROS2OpenCV2(node_name)
-        rospy.loginfo("Starting node " + str(node_name))
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down ros2opencv node."

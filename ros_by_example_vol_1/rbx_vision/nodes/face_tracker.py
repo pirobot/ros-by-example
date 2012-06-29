@@ -4,7 +4,21 @@
 
     Combines the OpenCV Haar face detector with Good Features to Track and Lucas-Kanade
     optical flow tracking.
-     
+    
+    Created for the Pi Robot Project: http://www.pirobot.org
+    Copyright (c) 2012 Patrick Goebel.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details at:
+    
+    http://www.gnu.org/licenses/gpl.html
 """
 
 import roslib
@@ -12,16 +26,14 @@ roslib.load_manifest('rbx_vision')
 import rospy
 import cv2
 import cv2.cv as cv
-from ros2opencv2 import ROS2OpenCV2
+import numpy as np
 from lk_tracker import LKTracker
 from face_detector import FaceDetector
-import numpy as np
 
 class FaceTracker(FaceDetector, LKTracker):
     def __init__(self, node_name):
-        FaceDetector.__init__(self, node_name)
-        LKTracker.__init__(self, node_name)
-            
+        super(FaceTracker, self).__init__(node_name)
+                    
         self.n_faces = rospy.get_param("~n_faces", 1)
         self.show_text = rospy.get_param("~show_text", True)
         self.feature_size = rospy.get_param("~feature_size", 1)
@@ -80,11 +92,6 @@ if __name__ == '__main__':
     try:
         node_name = "face_tracker"
         FaceTracker(node_name)
-        try:
-            rospy.init_node(node_name)
-        except:
-            pass
-        rospy.loginfo("Starting node " + str(node_name))
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down face tracker node."

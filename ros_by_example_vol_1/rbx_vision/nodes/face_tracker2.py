@@ -19,9 +19,8 @@ import numpy as np
 
 class FaceTracker(FaceDetector, LKTracker):
     def __init__(self, node_name):
-        FaceDetector.__init__(self, node_name)
-        LKTracker.__init__(self, node_name)
-            
+        super(FaceTracker, self).__init__(node_name)
+
         self.n_faces = rospy.get_param("~n_faces", 1)
         self.show_text = rospy.get_param("~show_text", True)
         self.feature_size = rospy.get_param("~feature_size", 1)
@@ -306,10 +305,6 @@ if __name__ == '__main__':
     try:
         node_name = "face_tracker"
         FaceTracker(node_name)
-        try:
-            rospy.init_node(node_name)
-        except:
-            pass
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down face tracker node."

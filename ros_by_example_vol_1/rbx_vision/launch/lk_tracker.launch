@@ -5,7 +5,7 @@
      <rosparam>
        show_text: True
        gf_maxCorners: 200
-       gf_qualityLevel: 0.005
+       gf_qualityLevel: 0.02
        gf_minDistance: 7
        gf_blockSize: 10
        gf_useHarrisDetector: False

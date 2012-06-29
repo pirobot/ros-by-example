@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 """ face_detector.py - Version 1.0 2012-02-11
@@ -5,6 +6,21 @@
     Based on the OpenCV facedetect.py demo code
     
     Extends the ros2opencv2.py script which takes care of user input and image display
+    
+    Created for the Pi Robot Project: http://www.pirobot.org
+    Copyright (c) 2011 Patrick Goebel.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details at:
+    
+    http://www.gnu.org/licenses/gpl.html
 """
 
 import roslib; roslib.load_manifest('rbx_vision')
@@ -15,8 +31,8 @@ from ros2opencv2 import ROS2OpenCV2
 
 class FaceDetector(ROS2OpenCV2):
     def __init__(self, node_name):
-        ROS2OpenCV2.__init__(self, node_name)
-          
+        super(FaceDetector, self).__init__(node_name)
+                  
         # Get the paths to the cascade XML files for the Haar detectors.
         # These are set in the launch file.
         cascade_1 = rospy.get_param("~cascade_1", "")
@@ -122,10 +138,6 @@ if __name__ == '__main__':
     try:
         node_name = "face_detector"
         FaceDetector(node_name)
-        try:
-            rospy.init_node(node_name)
-        except:
-            pass
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down face detector node."
