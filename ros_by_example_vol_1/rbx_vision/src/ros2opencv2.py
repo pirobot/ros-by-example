@@ -39,9 +39,7 @@ import time
 import numpy as np
 
 class ROS2OpenCV2(object):
-    def __init__(self, node_name):
-        super(ROS2OpenCV2, self).__init__()
-        
+    def __init__(self, node_name):        
         self.node_name = node_name
 
         rospy.init_node(node_name)
@@ -50,7 +48,7 @@ class ROS2OpenCV2(object):
         rospy.on_shutdown(self.cleanup)
         
         # A number of parameters to determine what gets displayed on the
-        # screen.  These can be overridden the appropriate launch file
+        # screen. These can be overridden the appropriate launch file
         self.show_text = rospy.get_param("~show_text", True)
         self.show_features = rospy.get_param("~show_features", True)
         self.show_boxes = rospy.get_param("~show_boxes", True)
@@ -129,20 +127,6 @@ class ROS2OpenCV2(object):
             ymax = min(self.frame_height, max(y, self.drag_start[1]))
             self.selection = (xmin, ymin, xmax - xmin, ymax - ymin)
             
-    def depth_callback(self, data):
-        # Convert the ROS image to OpenCV format using a cv_bridge helper function
-        depth_image = self.convert_depth_image(data)
-        
-        # Some webcams invert the image
-        if self.flip_image:    
-            depth_image = cv2.flip(depth_image, 0)
-        
-        # Process the depth image
-        processed_depth_image = self.process_depth_image(depth_image)
-        
-        # Make a global copy
-        self.processed_depth_image = processed_depth_image.copy()
-
     def image_callback(self, data):
         # Store the image header in a global variable
         self.image_header = data.header
@@ -194,8 +178,9 @@ class ROS2OpenCV2(object):
         # Merge the processed image and the marker image
         self.display_image = cv2.bitwise_or(self.processed_image, self.marker_image)
 
-        # If we have a track box, then display it
-        if self.track_box is not None:
+        # If we have a track box, then display it.  The track box can be either a regular
+        # cvRect or a rotated Rect.
+        if self.track_box is not None and self.is_rect_nonzero(self.track_box):
             try:
                 (center, size, angle) = self.track_box
                 pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
@@ -210,12 +195,12 @@ class ROS2OpenCV2(object):
                     center = x + w / 2, y + h / 2
                     pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                     pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), self.feature_size, 8, 0)
+                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(50, 255, 50), self.feature_size, 8, 0)
                 except:
                     pass
 
         # Otherwise, if we have a detect box then display it
-        elif self.detect_box is not None:
+        elif self.detect_box is not None and self.is_rect_nonzero(self.detect_box):
             (pt1_x, pt1_y, w, h) = self.detect_box
             if self.show_boxes:
                 cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), self.feature_size, 8, 0)
@@ -269,7 +254,22 @@ class ROS2OpenCV2(object):
                 self.show_text = not self.show_text
             elif cc == 'q':
                 # The has press the q key, so exit
-                rospy.signal_shutdown("User hit q key to quit.")      
+                rospy.signal_shutdown("User hit q key to quit.")
+                
+    def depth_callback(self, data):
+        # Convert the ROS image to OpenCV format using a cv_bridge helper function
+        depth_image = self.convert_depth_image(data)
+        
+        # Some webcams invert the image
+        if self.flip_image:    
+            depth_image = cv2.flip(depth_image, 0)
+        
+        # Process the depth image
+        processed_depth_image = self.process_depth_image(depth_image)
+        
+        # Make global copies
+        self.depth_image = depth_image.copy()
+        self.processed_depth_image = processed_depth_image.copy()
           
     def convert_image(self, ros_image):
         # Use cv_bridge() to convert the ROS image to OpenCV format

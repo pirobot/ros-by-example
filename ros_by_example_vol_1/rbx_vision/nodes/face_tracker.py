@@ -27,8 +27,8 @@ import rospy
 import cv2
 import cv2.cv as cv
 import numpy as np
-from lk_tracker import LKTracker
 from face_detector import FaceDetector
+from lk_tracker import LKTracker
 
 class FaceTracker(FaceDetector, LKTracker):
     def __init__(self, node_name):
@@ -38,14 +38,7 @@ class FaceTracker(FaceDetector, LKTracker):
         self.show_text = rospy.get_param("~show_text", True)
         self.feature_size = rospy.get_param("~feature_size", 1)
         
-        self.use_depth_for_detection = rospy.get_param("~use_depth_for_detection", False)
-        self.fov_width = rospy.get_param("~fov_width", 1.094)
-        self.fov_height = rospy.get_param("~fov_height", 1.094)
-        self.max_object_size = rospy.get_param("~max_face_size", 0.28)
-
-        self.detect_interval = 1
         self.keypoints = list()
-
         self.detect_box = None
         self.track_box = None
         
@@ -53,37 +46,41 @@ class FaceTracker(FaceDetector, LKTracker):
         self.prev_grey = None
     
     def process_image(self, cv_image):
-        """ STEP 0: Preprocess the image """
         # Create a greyscale version of the image
         self.grey = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         
         # Equalize the grey histogram to minimize lighting effects
         self.grey = cv2.equalizeHist(self.grey)
         
-        """ STEP 1: Detect the face if we haven't already """
+        # STEP 1: Detect the face if we haven't already
         if self.detect_box is None:
-            self.detect_box = self.detect_face(self.grey)
-        
-        """ Step 2: Extract keypoints """
-        if self.track_box is None or not self.is_rect_nonzero(self.track_box):
-            self.track_box = self.detect_box
-            self.keypoints = list()
-            self.keypoints = self.get_keypoints(self.grey, self.track_box)
+            self.detect_box = self.detect_face(self.grey)    
+        else:
+            # Step 2: If we aren't yet tracking keypoints, get them now
+            if self.track_box is None or not self.is_rect_nonzero(self.track_box):
+                self.track_box = self.detect_box
+                self.keypoints = self.get_keypoints(self.grey, self.track_box)
             
-        if self.prev_grey is None:
-            self.prev_grey = self.grey
-            
-        """ Step 3:  Track keypoints using optical flow """
-        self.track_box = self.track_keypoints(self.grey, self.prev_grey)
+            # Step 3: If we have keypoints, track them using optical flow
+            if len(self.keypoints) > 0:
+                # Store a copy of the current grey image used for LK tracking 
+                if self.prev_grey is None:
+                    self.prev_grey = self.grey
+                    
+                self.track_box = self.track_keypoints(self.grey, self.prev_grey)
+            else:
+                # We have lost all keypoints so re-detect he face
+                self.detect_box = None
         
         # Process any special keyboard commands for this module
         if 32 <= self.keystroke and self.keystroke < 128:
             cc = chr(self.keystroke).lower()
             if cc == 'c':
-                self.keypoints = []
+                self.keypoints = list()
                 self.track_box = None
                 self.detect_box = None
-                
+
+        # Set store a copy of the current image used for LK tracking         
         self.prev_grey = self.grey
                 
         return cv_image                

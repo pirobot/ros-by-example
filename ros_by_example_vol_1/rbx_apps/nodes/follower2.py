@@ -39,15 +39,6 @@ class Follower():
         # Set the shutdown function (stop the robot)
         rospy.on_shutdown(self.shutdown)
         
-        # The dimensions (in meters) of the box in which we will search
-        # for the person (blob). These are given in camera coordinates
-        # where x is left/right,y is up/down and z is depth (forward/backward)
-        self.min_x = rospy.get_param("~min_x", -0.2)
-        self.max_x = rospy.get_param("~max_x", 0.2)
-        self.min_y = rospy.get_param("~min_y", -0.3)
-        self.max_y = rospy.get_param("~max_y", 0.5)
-        self.max_z = rospy.get_param("~max_z", 1.2)
-        
         # The goal distance (in meters) to keep between the robot and the person
         self.goal_z = rospy.get_param("~goal_z", 0.6)
         
@@ -94,12 +85,10 @@ class Follower():
             pt_y = point[1]
             pt_z = point[2]
             
-            # Keep only those points within our designated boundaries and sum them up
-            if -pt_y > self.min_y and -pt_y < self.max_y and  pt_x < self.max_x and pt_x > self.min_x and pt_z < self.max_z:
-                x += pt_x
-                y += pt_y
-                z += pt_z
-                n += 1
+            x += pt_x
+            y += pt_y
+            z += pt_z
+            n += 1
                 
         # Stop the robot by default
         move_cmd = Twist()

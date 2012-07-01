@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 """ face_detector.py - Version 1.0 2012-02-11
@@ -51,7 +50,7 @@ class FaceDetector(ROS2OpenCV2):
         self.haar_scaleFactor = rospy.get_param("~haar_scaleFactor", 1.3)
         self.haar_minNeighbors = rospy.get_param("~haar_minNeighbors", 1)
         self.haar_flags = rospy.get_param("~haar_flags", cv.CV_HAAR_DO_CANNY_PRUNING)
-
+        
         # Store all parameters together for passing to the detector
         self.haar_params = dict(minSize = self.haar_minSize,
                                 maxSize = self.haar_maxSize,

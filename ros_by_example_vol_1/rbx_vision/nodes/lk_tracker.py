@@ -33,7 +33,7 @@ class LKTracker(GoodFeatures):
         
         self.show_text = rospy.get_param("~show_text", True)
         self.feature_size = rospy.get_param("~feature_size", 1)
-        
+                
         # LK parameters
         self.lk_winSize = rospy.get_param("~lk_winSize", (10, 10))
         self.lk_maxLevel = rospy.get_param("~lk_maxLevel", 2)
@@ -46,7 +46,7 @@ class LKTracker(GoodFeatures):
                   derivLambda = self.lk_derivLambda )    
         
         self.detect_interval = 1
-        self.keypoints = list()
+        self.keypoints = None
 
         self.detect_box = None
         self.track_box = None
@@ -70,7 +70,6 @@ class LKTracker(GoodFeatures):
         # detect box and extract the keypoints within it
         if self.track_box is None or not self.is_rect_nonzero(self.track_box):
             self.track_box = self.detect_box
-            self.keypoints = list()
             self.keypoints = self.get_keypoints(self.grey, self.track_box)
         
         else:
@@ -86,7 +85,7 @@ class LKTracker(GoodFeatures):
             cc = chr(self.keystroke).lower()
             if cc == 'c':
                 # Clear the current keypoints
-                self.keypoints = list()
+                self.keypoints = None
                 self.track_box = None
                 self.detect_box = None
                 self.classifier_initialized = True
@@ -106,12 +105,12 @@ class LKTracker(GoodFeatures):
             p0 = np.float32([p for p in self.keypoints]).reshape(-1, 1, 2)
             
             # Calculate the optical flow from the previous frame
-            # tp the current frame
+            # to the current frame
             p1, st, err = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **self.lk_params)
             
             # Do the reverse calculation: from the current frame
             # to the previous frame
-            p0r, st, err = cv2.calcOpticalFlowPyrLK(img1, img0, p1, None, **self.   lk_params)
+            p0r, st, err = cv2.calcOpticalFlowPyrLK(img1, img0, p1, None, **self.lk_params)
             
             # Compute the distance between corresponding points
             # in the two flows
@@ -147,7 +146,8 @@ class LKTracker(GoodFeatures):
                 track_box = cv.FitEllipse2(self.keypoints_matrix)
             else:
                 # Otherwise, find the best fitting rectangle
-                track_box = cv2.boundingRect(self.keypoints_matrix)
+                #track_box = cv2.boundingRect(self.keypoints_matrix)
+                track_box = None
         except:
             track_box = None
             

@@ -1,32 +1,26 @@
-<launch>
-  <arg name="auto_face_tracking" default="True" />
-  
+<launch>  
   <node pkg="rbx_vision" name="face_tracker2" type="face_tracker2.py" output="screen">
 
     <remap from="input_rgb_image" to="/camera/rgb/image_color" />
     <remap from="input_depth_image" to="/camera/depth/image" />
-
-    <param name="auto_face_tracking" value="$(arg auto_face_tracking)" />
     
     <rosparam>
-      use_haar_only: False
       use_depth_for_tracking: False
-      auto_min_keypoints: True
       min_keypoints: 20
       abs_min_keypoints: 6
       add_keypoint_distance: 10
       std_err_xy: 2.5
       pct_err_z: 0.42
       max_mse: 10000
+      add_keypoints_interval: 1
+      drop_keypoints_interval: 1
       show_text: True
       show_features: True
+      show_add_drop: False
       feature_size: 1
-      fov_width: 1.094
-      fov_height: 1.094
-      max_face_size: 0.28
       expand_roi: 1.02
       gf_maxCorners: 200
-      gf_qualityLevel: 0.01
+      gf_qualityLevel: 0.02
       gf_minDistance: 7
       gf_blockSize: 10
       gf_useHarrisDetector: False
