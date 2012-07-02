@@ -95,6 +95,10 @@ class HeadTracker():
         # Monitor the joint states of the pan and tilt servos
         self.joint_state = JointState()
         rospy.Subscriber('joint_states', JointState, self.update_joint_state)
+        
+        # Wait until we actually have joint state values
+        while self.joint_state == JointState():
+            rospy.sleep(1)
 
         # Subscribe to camera_info topics and set the callback
         self.image_width = self.image_height = 0
@@ -112,8 +116,8 @@ class HeadTracker():
         while not rospy.is_shutdown():
             # If we have lost the target, stop the servos
             if not self.target_visible:
-                self.pan_speed = ZERO_SPEED
-                self.tilt_speed = ZERO_SPEED
+                self.pan_speed = 0
+                self.tilt_speed = 0
                 # Keep track of how long the target is lost
                 self.target_lost_count += 1
             else:
@@ -131,7 +135,7 @@ class HeadTracker():
                         self.last_pan_speed = self.pan_speed
                     self.set_servo_position(self.head_pan_joint, self.pan_position)
                 except:
-                    # If there are any exceptions, mometarily stop the head movement by setting
+                    # If there are exceptions, momentarily stop the head movement by setting
                     # the target pan position to the current position
                     try:
                         current_pan_position = seself.tilt_speedlf.joint_state.position[self.joint_state.name.index(self.head_pan_joint)]
@@ -148,7 +152,7 @@ class HeadTracker():
                         self.last_tilt_speed = self.tilt_speed
                     self.set_servo_position(self.head_tilt_joint, self.tilt_position)
                 except:
-                    # If there are any exceptions, mometarily stop the head movement by setting
+                    # If there are exceptions, momentarily stop the head movement by setting
                     # the target tilt position to the current position
                     try:
                         current_tilt_position = self.joint_state.position[self.joint_state.name.index(self.head_tilt_joint)]
@@ -233,36 +237,32 @@ class HeadTracker():
         # Pan the camera only if the x target offset exceeds the threshold
         if abs(percent_offset_x) > self.pan_threshold:
             # Set the pan speed proportion to the target offset
-            self.pan_speed = trunc(min(self.max_joint_speed, max(ZERO_SPEED, self.gain_pan * abs(percent_offset_x))), 2)
+            self.pan_speed = trunc(min(self.max_joint_speed, max(0, self.gain_pan * abs(percent_offset_x))), 2)
             
             # Set the target position ahead or behind the current position
-            try:
-                current_pan = self.joint_state.position[self.joint_state.name.index(self.head_pan_joint)]
-            except:
-                return
+            current_pan = self.joint_state.position[self.joint_state.name.index(self.head_pan_joint)]
+
             if target_offset_x > 0:
                 self.pan_position = max(self.min_pan, current_pan - self.lead_target_angle)
             else:
                 self.pan_position = min(self.max_pan, current_pan + self.lead_target_angle)
         else:
-            self.pan_speed = ZERO_SPEED
+            self.pan_speed = 0
         
         # Tilt the camera only if the y target offset exceeds the threshold
         if abs(percent_offset_y) > self.tilt_threshold:
             # Set the tilt speed proportion to the target offset
-            self.tilt_speed = trunc(min(self.max_joint_speed, max(ZERO_SPEED, self.gain_tilt * abs(percent_offset_y))), 2)
+            self.tilt_speed = trunc(min(self.max_joint_speed, max(0, self.gain_tilt * abs(percent_offset_y))), 2)
 
             # Set the target position ahead or behind the current position
-            try:
-                current_tilt = self.joint_state.position[self.joint_state.name.index(self.head_tilt_joint)]
-            except:
-                return
+            current_tilt = self.joint_state.position[self.joint_state.name.index(self.head_tilt_joint)]
+
             if target_offset_y < 0:
                 self.tilt_position = max(self.min_tilt, current_tilt - self.lead_target_angle)
             else:
                 self.tilt_position = min(self.max_tilt, current_tilt + self.lead_target_angle)
         else:
-            self.tilt_speed = ZERO_SPEED
+            self.tilt_speed = 0
             
     def center_head_servos(self):
         try:
