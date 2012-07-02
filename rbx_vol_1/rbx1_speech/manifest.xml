@@ -1,13 +1,13 @@
 <package>
-  <description brief="rbx_speech">
+  <description brief="rbx1_speech">
 
-     ROS Tutorial for using pocketsphinx and TTS
+     ROS by Example Vol 1 Speech Package
 
   </description>
   <author>Patrick Goebel</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/rbx_speech</url>
+  <url>http://ros.org/wiki/rbx1_speech</url>
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="pocketsphinx"/>

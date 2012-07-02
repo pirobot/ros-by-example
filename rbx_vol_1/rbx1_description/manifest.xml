@@ -1,13 +1,13 @@
 <package>
-  <description brief="rbx_description">
+  <description brief="rbx1_description">
 
-    URDF/Xacro files for the ROS By Example Stack
+    ROS By Example Vol 1 URDF/Xacro Package
 
   </description>
   <author>Patrick Goebel</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/rbx_description</url>
+  <url>http://ros.org/wiki/rbx1_description</url>
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="urdf"/>

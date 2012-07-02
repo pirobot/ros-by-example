@@ -5,7 +5,7 @@
   <author>Maintained by Patrick Goebel</author>
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/ros_by_example_vol_1</url>
+  <url>http://ros.org/wiki/rbx_vol_1</url>
   <depend stack="audio_common" /> <!-- sound_play -->
   <depend stack="common" /> <!-- actionlib -->
   <depend stack="common_msgs" /> <!-- nav_msgs, sensor_msgs, geometry_msgs, visualization_msgs -->

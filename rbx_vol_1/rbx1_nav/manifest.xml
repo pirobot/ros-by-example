@@ -1,14 +1,13 @@
 <package>
-  <description brief="rbx_nav">
+  <description brief="rbx1_nav">
 
-    Demonstrating basic use of the ROS navigation control
-    for a differential drive mobile robot.
+    ROS by Example Vol 1 Navigation Package
 
   </description>
   <author>Patrick Goebel</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/rbx_nav</url>
+  <url>http://ros.org/wiki/rbx1_nav</url>
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="geometry_msgs"/>

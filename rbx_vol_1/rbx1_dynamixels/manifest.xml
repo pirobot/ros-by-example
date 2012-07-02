@@ -1,14 +1,13 @@
 <package>
-  <description brief="rbx_dynamixels">
+  <description brief="rbx1_dynamixels">
 
-     Startup files an demo nodes using the dynamixel_motor stack
-     and the Dynamixel Servos from Robotis
+    ROS by Example Vol 1 Dynamixels Package
 
   </description>
   <author>Patrick Goebel</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/rbx_dynamixels</url>
+  <url>http://ros.org/wiki/rbx1_dynamixels</url>
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="sensor_msgs"/>
