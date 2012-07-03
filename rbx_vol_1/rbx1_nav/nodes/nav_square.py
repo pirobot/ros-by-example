@@ -21,7 +21,7 @@
       
 """
 
-import roslib; roslib.load_manifest('rbx_nav')
+import roslib; roslib.load_manifest('rbx1_nav')
 import rospy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry

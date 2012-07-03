@@ -10,7 +10,7 @@
   See http://www.ros.org/wiki/pocketsphinx
 """
 
-import roslib; roslib.load_manifest('rbx_speech')
+import roslib; roslib.load_manifest('rbx1_speech')
 import rospy
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String

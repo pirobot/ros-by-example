@@ -25,7 +25,7 @@
     http://www.gnu.org/licenses/gpl.html
 """
 
-import roslib; roslib.load_manifest('rbx_apps')
+import roslib; roslib.load_manifest('rbx1_apps')
 import rospy
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import Twist

@@ -6,7 +6,7 @@
     coordinates to the /roi topic.   
 """
 
-import roslib; roslib.load_manifest('rbx_vision')
+import roslib; roslib.load_manifest('rbx1_vision')
 import rospy
 import cv2
 from cv2 import cv as cv

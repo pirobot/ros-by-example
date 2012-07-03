@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <robot>
-  <include filename="$(find rbx_dynamixels)/urdf/turtlebot_hardware.xacro" />
+  <include filename="$(find rbx1_dynamixels)/urdf/turtlebot_hardware.xacro" />
   <include filename="$(find turtlebot_description)/urdf/gazebo.urdf.xacro"/>
   
   <property name="M_PI" value="3.14159"/>
@@ -451,7 +451,7 @@
     <visual>
       <origin xyz=" 0 0 0 " rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://rbx_dynamixels/meshes/kinect.dae"/>
+        <mesh filename="package://rbx1_dynamixels/meshes/kinect.dae"/>
       </geometry>
     </visual>
 

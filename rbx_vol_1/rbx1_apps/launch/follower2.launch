@@ -38,7 +38,7 @@
     </rosparam>
   </node>
   
-  <node pkg="rbx_apps" name="follower" type="follower2.py" output="screen">
+  <node pkg="rbx1_apps" name="follower" type="follower2.py" output="screen">
     <remap from="point_cloud" to="search_cloud" />
     
     <rosparam>

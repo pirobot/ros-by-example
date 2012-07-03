@@ -4,7 +4,7 @@
     Relax all servos by disabling the torque for each.
 """
 import roslib
-roslib.load_manifest('pi_head_tracking_3d_part2')
+roslib.load_manifest('rbx1_dynamixels')
 import rospy, time
 from dynamixel_controllers.srv import TorqueEnable, SetSpeed
 

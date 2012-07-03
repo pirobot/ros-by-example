@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="rbx_apps" name="object_tracker" type="object_tracker.py" output="screen">
+  <node pkg="rbx1_apps" name="object_tracker" type="object_tracker.py" output="screen">
     <remap from="camera_info" to="/camera/rgb/camera_info" />
     <rosparam>
        rate: 10

@@ -21,7 +21,7 @@
     http://www.gnu.org/licenses/gpl.htmlPoint
 """
 
-import roslib; roslib.load_manifest('rbx_speech')
+import roslib; roslib.load_manifest('rbx1_speech')
 import rospy
 from std_msgs.msg import String
 from sound_play.libsoundplay import SoundClient

@@ -1,6 +1,6 @@
 <launch>
 
-  <node name="voice_nav" pkg="rbx_speech" type="voice_nav.py" output="screen">
+  <node name="voice_nav" pkg="rbx1_speech" type="voice_nav.py" output="screen">
     <param name="scale_linear" value="0.5" type="double"/>
     <param name="scale_angular" value="1.5" type="double"/>
   	<param name="max_speed" value="0.3"/>

@@ -22,7 +22,7 @@
 """
 
 import roslib
-roslib.load_manifest('rbx_vision')
+roslib.load_manifest('rbx1_vision')
 import rospy
 import cv2
 import cv2.cv as cv

@@ -6,8 +6,8 @@
     xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
 
     <!-- Included URDF Files -->
-    <include filename="$(find rbx_dynamixels)/urdf/turtlebot.xacro" />
-    <include filename="$(find rbx_dynamixels)/urdf/head.xacro" />
+    <include filename="$(find rbx1_dynamixels)/urdf/turtlebot.xacro" />
+    <include filename="$(find rbx1_dynamixels)/urdf/head.xacro" />
 
     <turtlebot />
     

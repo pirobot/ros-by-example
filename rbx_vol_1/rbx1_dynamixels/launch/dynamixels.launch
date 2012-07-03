@@ -1,6 +1,6 @@
 <launch>	
     <!-- Load the URDF/Xacro model of our robot -->
-	<param name="robot_description" command="$(find xacro)/xacro.py '$(find rbx_dynamixels)/urdf/pi_turtlebot.xacro'" />
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find rbx1_dynamixels)/urdf/pi_turtlebot.xacro'" />
 
     <!-- Publish the robot state -->
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
@@ -23,7 +23,7 @@
    </node>
    
     <!-- Load joint controller configuration from YAML file to parameter server -->
-    <rosparam file="$(find rbx_dynamixels)/config/dynamixel_params.yaml" command="load"/>
+    <rosparam file="$(find rbx1_dynamixels)/config/dynamixel_params.yaml" command="load"/>
 
    <!-- Start the head pan and tilt controllers -->
    <node name="dynamixel_controller_spawner_ax12" pkg="dynamixel_controllers"
@@ -36,13 +36,13 @@
         output="screen" />
         
    <!-- Publish fake wheel states for the TurtleBot -->
-   <node name="fake_pub" pkg="rbx_dynamixels" type="fake_pub.py" />
+   <node name="fake_pub" pkg="rbx1_dynamixels" type="fake_pub.py" />
 
    <!-- Start the Dynamixel Joint States Publisher -->
-   <node name="dynamixel_joint_states_publisher" pkg="rbx_dynamixels" type="dynamixel_joint_state_publisher.py" output="screen" />
+   <node name="dynamixel_joint_states_publisher" pkg="rbx1_dynamixels" type="dynamixel_joint_state_publisher.py" output="screen" />
 
    <!-- Start all Dynamixels in the relaxed state -->
-   <node pkg="rbx_dynamixels" type="relax_all_servos.py" name="relax_all_servos" />
+   <node pkg="rbx1_dynamixels" type="relax_all_servos.py" name="relax_all_servos" />
   
    <!-- Publish a static transform between the robot base and the world frame -->
    <node pkg="tf" type="static_transform_publisher" name="world_base_broadcaster" args="0 0 0.0325 0 0 0 /world /base_link 100" />

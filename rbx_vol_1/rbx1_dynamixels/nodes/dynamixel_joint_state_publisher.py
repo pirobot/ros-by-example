@@ -21,7 +21,7 @@
     http://www.gnu.org/licenses/gpl.html
 """
 
-import roslib; roslib.load_manifest('pi_head_tracking_3d_part2')
+import roslib; roslib.load_manifest('rbx1_dynamixels')
 import rospy
 
 from sensor_msgs.msg import JointState as JointStatePR2

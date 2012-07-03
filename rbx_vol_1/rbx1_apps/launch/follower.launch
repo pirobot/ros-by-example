@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="rbx_apps" name="follower" type="follower.py" output="screen">
+  <node pkg="rbx1_apps" name="follower" type="follower.py" output="screen">
     <remap from="point_cloud" to="/camera/rgb/points" />
     
     <rosparam>

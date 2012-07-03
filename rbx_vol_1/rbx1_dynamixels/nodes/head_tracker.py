@@ -21,7 +21,7 @@
     http://www.gnu.org/licenses/gpl.html
 """
 
-import roslib; roslib.load_manifest('rbx_dynamixels')
+import roslib; roslib.load_manifest('rbx1_dynamixels')
 import rospy
 from sensor_msgs.msg import JointState, RegionOfInterest, CameraInfo
 from dynamixel_controllers.srv import *

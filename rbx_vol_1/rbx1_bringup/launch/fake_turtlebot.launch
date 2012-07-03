@@ -5,7 +5,7 @@
   <param name="robot_description" command="$(arg urdf_file)" />
     
   <node name="arbotix" pkg="arbotix_python" type="driver.py" output="screen">
-      <rosparam file="$(find rbx_bringup)/config/fake_turtlebot_arbotix.yaml" command="load" />
+      <rosparam file="$(find rbx1_bringup)/config/fake_turtlebot_arbotix.yaml" command="load" />
       <param name="sim" value="true"/>
   </node>
   

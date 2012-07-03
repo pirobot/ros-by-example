@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import roslib; roslib.load_manifest("turtlebot_arm_bringup")
+import roslib; roslib.load_manifest("rbx1_dynamixels")
 import rospy
 from sensor_msgs.msg import JointState
 

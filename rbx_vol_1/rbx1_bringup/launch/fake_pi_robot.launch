@@ -5,7 +5,7 @@
   <param name="robot_description" command="$(arg urdf_file)" />
     
   <node name="arbotix" pkg="arbotix_python" type="driver.py" output="screen">
-      <rosparam file="$(find rbx_bringup)/config/fake_pi_arbotix.yaml" command="load" />
+      <rosparam file="$(find rbx1_bringup)/config/fake_pi_arbotix.yaml" command="load" />
       <param name="sim" value="true"/>
   </node>
   
@@ -22,7 +22,7 @@
   -->
     
   <!--
-  <node name="pi_robot_arm_down" pkg="rbx_bringup" type="pi_robot_arm_down">
+  <node name="pi_robot_arm_down" pkg="rbx1_bringup" type="pi_robot_arm_down">
      <param name="rate" value="5.0"/>
   </node>
   -->

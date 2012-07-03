@@ -4,10 +4,10 @@
   <arg name="map" default="blank_map.yaml" />
 
   <!-- Run the map server with the desired map -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find rbx_nav)/maps/$(arg map)"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find rbx1_nav)/maps/$(arg map)"/>
 
   <!-- The move_base node -->
-  <include file="$(find rbx_nav)/launch/move_base.launch" />
+  <include file="$(find rbx1_nav)/launch/move_base.launch" />
   
   <!-- Run AMCL -->
   <node pkg="amcl" type="amcl" name="amcl" args="scan:=scan" output="screen">

@@ -22,7 +22,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://pi_tb_description/meshes/68-02403-125_Spacer.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
+          <mesh filename="package://rbx1_dynamixels/meshes/68-02403-125_Spacer.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}" />
         </geometry>
       </visual>
 
@@ -54,7 +54,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://pi_tb_description/meshes/68-04552-1000-RA_Turtlebot_M-F_Standoff.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/68-04552-1000-RA_Turtlebot_M-F_Standoff.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
         </geometry>
       </visual>
 
@@ -86,7 +86,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://pi_tb_description/meshes/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
         </geometry>
       </visual>
 
@@ -118,7 +118,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://pi_tb_description/meshes/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE*1.5}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/68-04552-2000-RA_Turtlebot_M-F_Standoff.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE*1.5}"/>
         </geometry>
       </visual>
 
@@ -151,7 +151,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://pi_tb_description/meshes/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/68-02421-8000-RA_Turtlebot_F-F_Standoff.dae" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
         </geometry>
       </visual>
 

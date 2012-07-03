@@ -29,7 +29,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://rbx_dynamixels/meshes/F10.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/F10.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
         </geometry>
         <material name="${color}"/>
       </visual>
@@ -62,7 +62,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://rbx_dynamixels/meshes/F3.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/F3.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
         </geometry>
         <material name="${color}"/>
       </visual>
@@ -95,7 +95,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://rbx_dynamixels/meshes/ax12_box.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/ax12_box.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
         </geometry>
         <material name="black"/>
       </visual>
@@ -130,7 +130,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://rbx_dynamixels/meshes/F3.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/F3.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
         </geometry>
         <material name="${color}"/>
       </visual>
@@ -165,7 +165,7 @@
       <visual>
         <origin xyz=" 0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://rbx_dynamixels/meshes/F4.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
+          <mesh filename="package://rbx1_dynamixels/meshes/F4.${MESH_EXT}" scale="${M_SCALE} ${M_SCALE} ${M_SCALE}"/>
         </geometry>
         <material name="${color}"/>
       </visual>

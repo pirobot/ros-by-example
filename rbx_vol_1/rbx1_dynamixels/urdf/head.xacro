@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <robot>
-  <include filename="$(find rbx_dynamixels)/urdf/head_hardware.xacro" />
+  <include filename="$(find rbx1_dynamixels)/urdf/head_hardware.xacro" />
 
   <macro name="turtlebot_head" params="parent color *origin"> 
     <link name="head_base_link" />     
@@ -57,7 +57,7 @@
       <visual>
         <origin xyz="0 0 0 " rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://rbx_dynamixels/meshes/kinect.dae" />
+          <mesh filename="package://rbx1_dynamixels/meshes/kinect.dae" />
         </geometry>
       </visual>
 

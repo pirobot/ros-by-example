@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="rbx_vision" name="template_tracker" type="template_tracker.py" output="screen">
+  <node pkg="rbx1_vision" name="template_tracker" type="template_tracker.py" output="screen">
 
     <remap from="input_rgb_image" to="/camera/rgb/image_color" />
     <remap from="input_depth_image" to="/camera/depth/image" />
@@ -14,7 +14,7 @@
       max_object_size: 0.28
     </rosparam>
     
-  	<param name="template_file" value="$(find rbx_vision)/data/templates/faces/mona_live/Template_0.png" />
+  	<param name="template_file" value="$(find rbx1_vision)/data/templates/faces/mona_live/Template_0.png" />
 
   </node>
 </launch>

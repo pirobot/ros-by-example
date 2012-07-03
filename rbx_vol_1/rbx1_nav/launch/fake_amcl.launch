@@ -4,10 +4,10 @@
   <arg name="map" default="test_map.yaml" />
 
   <!-- Run the map server with the desired map -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find rbx_nav)/maps/$(arg map)"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find rbx1_nav)/maps/$(arg map)"/>
 
   <!-- The move_base node -->
-  <include file="$(find rbx_nav)/launch/move_base.launch" />
+  <include file="$(find rbx1_nav)/launch/move_base.launch" />
   
   <!-- Run fake localization compatible with AMCL output -->
   <node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen" />
