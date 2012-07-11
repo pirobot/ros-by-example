@@ -49,8 +49,8 @@ class MoveBaseSquare():
         # Append the first turn
         quaternions.append(q)
         
-        # The second orientation is also 90 degrees
-        q_turn_angle = quaternion_from_euler(0, 0, pi/2, axes='sxyz')
+        # The second orientation is 180 degrees
+        q_turn_angle = quaternion_from_euler(0, 0, pi, axes='sxyz')
         q = Quaternion(*q_turn_angle)
         # Append the second turn
         quaternions.append(q)

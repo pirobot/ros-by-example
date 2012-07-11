@@ -1,0 +1,35 @@
+#planner_patience: 5.0
+#controller_patience: 15.0
+recovery_behavior_enabled: false
+clearing_rotation_allowed: false
+base_global_planner: navfn/NavfnROS
+base_local_planner: dwa_local_planner/DWAPlannerROS
+
+DWAPlannerROS:
+  controller_frequency: 5.0
+  max_trans_vel: 0.5
+  min_trans_vel: 0.1
+  max_vel_x: 0.5
+  min_vel_x: 0.1
+  max_rot_vel: 1.2
+  min_rot_vel: 0.1
+  acc_lim_x: 1.0
+  acc_lim_y: 1.0
+  acc_lim_th: 2.0
+
+  holonomic_robot: false
+  yaw_goal_tolerance: 0.2 # about 11 degrees
+  xy_goal_tolerance: 0.05 # 5 cm
+  goal_distance_bias: 24.0
+  path_distance_bias: 32.0
+
+  oscillation_reset_dist: 0.05
+  occdist_scale: 0.01
+
+  sim_time: 1.7
+  sim_granularity: 0.025
+  vx_samples: 3
+  vtheta_samples: 20
+  simple_attractor: false
+  publish_cost_grid_pc: false
+
