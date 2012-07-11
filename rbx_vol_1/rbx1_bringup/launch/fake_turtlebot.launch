@@ -10,7 +10,7 @@
   </node>
   
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
-      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="publish_frequency" type="double" value="30.0" />
   </node>
   
   <!-- We need a static transforms for the wheels -->

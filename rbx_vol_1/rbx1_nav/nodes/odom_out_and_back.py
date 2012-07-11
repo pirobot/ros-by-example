@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-""" nav_square.py - Version 0.1 2012-03-24
+""" odom_out_and_back.py - Version 0.1 2012-03-24
 
-    A basic demo of the using odometry data to move the robot
-    along a square trajectory.
+    A basic demo of using the /odom topic to move a robot a given distance
+    or rotate through a given angle.
 
     Created for the Pi Robot Project: http://www.pirobot.org
     Copyright (c) 2012 Patrick Goebel.  All rights reserved.
@@ -25,34 +25,43 @@
 import roslib; roslib.load_manifest('rbx1_nav')
 import rospy
 from geometry_msgs.msg import Twist, Point, Quaternion
+from nav_msgs.msg import Odometry
 import tf
 from math import radians, copysign, sqrt, pow, pi
 from transform_utils import quat_to_angle, normalize_angle
 
-class NavSquare():
+class OutAndBack():
     def __init__(self):
         # Give the node a name
-        rospy.init_node('nav_square', anonymous=False)
-        
-        # Set rospy to exectute a shutdown function when terminating the script
+        rospy.init_node('out_and_back', anonymous=False)
+
+        # Set rospy to exectute a shutdown function when exiting       
         rospy.on_shutdown(self.shutdown)
 
-        # How fast will we check the odometry values?
-        rate = 50
+        # Publisher to control the robot's speed
+        self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)
+        
+        # How fast will we update the robot's movement?
+        rate = 100
         
         # Set the equivalent ROS rate variable
         r = rospy.Rate(rate)
         
-        # Set the parameters for the target square
-        goal_distance = rospy.get_param("~goal_distance", 1.0)      # meters
-        goal_angle = rospy.get_param("~goal_angle", radians(90))    # degrees converted to radians
-        linear_speed = rospy.get_param("~linear_speed", 0.2)        # meters per second
-        angular_speed = rospy.get_param("~angular_speed", 0.7)      # radians per second
-        angular_tolerance = rospy.get_param("~angular_tolerance", radians(2)) # degrees to radians
+        # Set the forward linear speed to 0.2 meters per second 
+        linear_speed = 0.2
         
-        # Publisher to control the robot's speed
-        self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)
-         
+        # Set the travel distance in meters
+        goal_distance = 1.0
+
+        # Set the rotation speed in radians per second
+        angular_speed = 1.0
+        
+        # Set the angular tolerance in degrees converted to radians
+        angular_tolerance = radians(2)
+        
+        # Set the rotation angle to Pi radians (180 degrees)
+        goal_angle = pi
+        
         # The base frame is base_footprint for the TurtleBot but base_link for Pi Robot
         self.base_frame = rospy.get_param('~base_frame', '/base_link')
 
@@ -67,9 +76,9 @@ class NavSquare():
         
         # Initialize the position variable as a Point type
         position = Point()
-
-        # Cycle through the four sides of the square
-        for i in range(4):
+            
+        # Loop once for each leg of the trip
+        for i in range(2):
             # Initialize the movement command
             move_cmd = Twist()
             
@@ -98,11 +107,11 @@ class NavSquare():
                 # Compute the Euclidean distance from the start
                 distance = sqrt(pow((position.x - x_start), 2) + 
                                 pow((position.y - y_start), 2))
-                
-            # Stop the robot before rotating
+
+            # Stop the robot before the rotation
             move_cmd = Twist()
             self.cmd_vel.publish(move_cmd)
-            rospy.sleep(1.0)
+            rospy.sleep(1)
             
             # Set the movement command to a rotation
             move_cmd.angular.z = angular_speed
@@ -113,11 +122,9 @@ class NavSquare():
             # Track how far we have turned
             turn_angle = 0
             
-            # Begin the rotation
             while abs(turn_angle + angular_tolerance) < abs(goal_angle) and not rospy.is_shutdown():
                 # Publish the Twist message and sleep 1 cycle         
                 self.cmd_vel.publish(move_cmd)
-                
                 r.sleep()
                 
                 # Get the current rotation
@@ -126,14 +133,16 @@ class NavSquare():
                 # Compute the amount of rotation since the last lopp
                 delta_angle = normalize_angle(rotation - last_angle)
                 
+                # Add to the running total
                 turn_angle += delta_angle
                 last_angle = rotation
-
+                
+            # Stop the robot before the next leg
             move_cmd = Twist()
             self.cmd_vel.publish(move_cmd)
-            rospy.sleep(1.0)
+            rospy.sleep(1)
             
-        # Stop the robot when we are done
+        # Stop the robot for good
         self.cmd_vel.publish(Twist())
         
     def get_odom(self):
@@ -145,16 +154,16 @@ class NavSquare():
             return
 
         return (Point(*trans), quat_to_angle(Quaternion(*rot)))
-            
+        
     def shutdown(self):
-        # Always stop the robot when shutting down the node
+        # Always stop the robot when shutting down the node.
         rospy.loginfo("Stopping the robot...")
         self.cmd_vel.publish(Twist())
         rospy.sleep(1)
-
+ 
 if __name__ == '__main__':
     try:
-        NavSquare()
-    except rospy.ROSInterruptException:
-        rospy.loginfo("Navigation terminated.")
+        OutAndBack()
+    except:
+        rospy.loginfo("Out-and-Back node terminated.")
 

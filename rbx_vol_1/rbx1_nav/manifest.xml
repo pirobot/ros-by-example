@@ -17,6 +17,7 @@
   <depend package="tf"/>
   <depend package="actionlib"/>
   <depend package="kdl"/>
+  <depend package="dynamic_reconfigure"/>
 
 </package>
 

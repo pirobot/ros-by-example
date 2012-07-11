@@ -7,13 +7,13 @@ GlobalPlan.Alpha=1
 GlobalPlan.ColorR=0
 GlobalPlan.ColorG=0.0117647
 GlobalPlan.ColorB=1
-GlobalPlan.Enabled=1
+GlobalPlan.Enabled=0
 GlobalPlan.Topic=/move_base/TrajectoryPlannerROS/global_plan
 Goal\ Pose.Alpha=1
 Goal\ Pose.ColorR=0.0196078
 Goal\ Pose.ColorG=0.678431
 Goal\ Pose.ColorB=0.0745098
-Goal\ Pose.Enabled=1
+Goal\ Pose.Enabled=0
 Goal\ Pose.Head\ Length=0.3
 Goal\ Pose.Head\ Radius=0.2
 Goal\ Pose.Shaft\ Length=0.5
@@ -39,7 +39,7 @@ Laser\ Scan.Alpha=1
 Laser\ Scan.Billboard\ Size=0.01
 Laser\ Scan.Color\ Transformer=
 Laser\ Scan.Decay\ Time=0
-Laser\ Scan.Enabled=1
+Laser\ Scan.Enabled=0
 Laser\ Scan.Position\ Transformer=
 Laser\ Scan.Selectable=1
 Laser\ Scan.Style=0
@@ -67,26 +67,34 @@ LocalPlan.Alpha=1
 LocalPlan.ColorR=1
 LocalPlan.ColorG=0
 LocalPlan.ColorB=0
-LocalPlan.Enabled=1
+LocalPlan.Enabled=0
 LocalPlan.Topic=/move_base/TrajectoryPlannerROS/local_plan
 Map.Alpha=0.7
 Map.Draw\ Behind=0
-Map.Enabled=1
+Map.Enabled=0
 Map.Topic=/map
-Marker.Enabled=1
+Marker.Enabled=0
 Marker.Marker\ Topic=/waypoint_markers
 Mouse\ Goal\ Pose.Alpha=1
 Mouse\ Goal\ Pose.ColorR=0.0156863
 Mouse\ Goal\ Pose.ColorG=0.8
 Mouse\ Goal\ Pose.ColorB=0.0509804
-Mouse\ Goal\ Pose.Enabled=1
+Mouse\ Goal\ Pose.Enabled=0
 Mouse\ Goal\ Pose.Head\ Length=0.3
 Mouse\ Goal\ Pose.Head\ Radius=0.2
 Mouse\ Goal\ Pose.Shaft\ Length=0.5
 Mouse\ Goal\ Pose.Shaft\ Radius=0.1
 Mouse\ Goal\ Pose.Shape=0
 Mouse\ Goal\ Pose.Topic=/move_base_simple/goal
-Odometry.Angle\ Tolerance=0.1
+Odometry\ EKF.Angle\ Tolerance=0.1
+Odometry\ EKF.ColorR=0.0470588
+Odometry\ EKF.ColorG=0.690196
+Odometry\ EKF.ColorB=0.152941
+Odometry\ EKF.Enabled=0
+Odometry\ EKF.Keep=100
+Odometry\ EKF.Position\ Tolerance=0.1
+Odometry\ EKF.Topic=/odom_ekf
+Odometry.Angle\ Tolerance=0.05
 Odometry.ColorR=0.870588
 Odometry.ColorG=0.784314
 Odometry.ColorB=0.0588235
@@ -94,6 +102,17 @@ Odometry.Enabled=1
 Odometry.Keep=100
 Odometry.Position\ Tolerance=0.1
 Odometry.Topic=/odom
+Pose.Alpha=1
+Pose.ColorR=1
+Pose.ColorG=0.1
+Pose.ColorB=0
+Pose.Enabled=0
+Pose.Head\ Length=0.3
+Pose.Head\ Radius=0.2
+Pose.Shaft\ Length=1
+Pose.Shaft\ Radius=0.1
+Pose.Shape=0
+Pose.Topic=
 Robot\ Model.Alpha=1
 Robot\ Model.Collision\ Enabled=0
 Robot\ Model.Enabled=1
@@ -103,7 +122,7 @@ Robot\ Model.Update\ Interval=0
 Robot\ Model.Visual\ Enabled=1
 Robot\:\ Robot\ Model\ Link\ base_footprintShow\ Axes=0
 Robot\:\ Robot\ Model\ Link\ base_footprintShow\ Trail=0
-Robot\:\ Robot\ Model\ Link\ base_linkShow\ Axes=0
+Robot\:\ Robot\ Model\ Link\ base_linkShow\ Axes=1
 Robot\:\ Robot\ Model\ Link\ base_linkShow\ Trail=0
 Robot\:\ Robot\ Model\ Link\ camera_linkShow\ Axes=0
 Robot\:\ Robot\ Model\ Link\ camera_linkShow\ Trail=0
@@ -164,8 +183,8 @@ Robot\:\ Robot\ Model\ Link\ standoff_kinect_1_linkShow\ Trail=0
 Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::FixedOrientationOrthoViewController
-Camera\ Config=207.151 -0.551612 1.89665 -0.463182 -0.707107 2.36136e-09 3.68075e-09 0.707107
-Property\ Grid\ State=selection=Background Color;expanded=.Global Options,Odometry.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=133,266;ispageselected=1
+Camera\ Config=179.668 -0.340851 1.89665 -0.440826 -0.707107 2.36136e-09 3.68075e-09 0.707107
+Property\ Grid\ State=selection=Odometry EKF.Enabled;expanded=Odometry.Enabled,Robot: Robot Model Link base_footprintbase_footprint,Robot: Robot Model Link base_linkbase_link,Marker.Enabled.Marker.StatusTopStatus,Marker.Enabled.Marker.Namespaces,Laser Scan.Enabled.Laser Scan.StatusTopStatus;scrollpos=0,0;splitterpos=133,266;ispageselected=1
 [Display0]
 Name=Grid
 Package=rviz
@@ -175,34 +194,42 @@ Name=Odometry
 Package=rviz
 ClassName=rviz::OdometryDisplay
 [Display2]
+Name=Odometry EKF
+Package=rviz
+ClassName=rviz::OdometryDisplay
+[Display3]
 Name=Robot Model
 Package=rviz
 ClassName=rviz::RobotModelDisplay
-[Display3]
+[Display4]
 Name=Map
 Package=rviz
 ClassName=rviz::MapDisplay
-[Display4]
+[Display5]
 Name=LocalPlan
 Package=rviz
 ClassName=rviz::PathDisplay
-[Display5]
+[Display6]
 Name=GlobalPlan
 Package=rviz
 ClassName=rviz::PathDisplay
-[Display6]
+[Display7]
 Name=Marker
 Package=rviz
 ClassName=rviz::MarkerDisplay
-[Display7]
+[Display8]
 Name=Laser Scan
 Package=rviz
 ClassName=rviz::LaserScanDisplay
-[Display8]
+[Display9]
 Name=Mouse Goal Pose
 Package=rviz
 ClassName=rviz::PoseDisplay
-[Display9]
+[Display10]
 Name=Goal Pose
+Package=rviz
+ClassName=rviz::PoseDisplay
+[Display11]
+Name=Pose
 Package=rviz
 ClassName=rviz::PoseDisplay

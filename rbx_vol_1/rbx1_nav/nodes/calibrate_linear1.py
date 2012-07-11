@@ -23,12 +23,13 @@
 
 import roslib; roslib.load_manifest('rbx1_nav')
 import rospy
-from geometry_msgs.msg import Twist, Point
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
 from math import copysign, sqrt, pow
 from dynamic_reconfigure.server import Server
 import dynamic_reconfigure.client
 from rbx1_nav.cfg import CalibrateLinearConfig
-import tf
+import threading
 
 class CalibrateLinear():
     def __init__(self):
@@ -38,8 +39,11 @@ class CalibrateLinear():
         # Set rospy to exectute a shutdown function when terminating the script
         rospy.on_shutdown(self.shutdown)
         
+        # Create a lock for reading odometry values
+        self.lock = threading.Lock()
+        
         # How fast will we check the odometry values?
-        self.rate = 30
+        self.rate = 50
         r = rospy.Rate(self.rate)
         
         # Set the distance to travel
@@ -57,28 +61,25 @@ class CalibrateLinear():
         
         # Publisher to control the robot's speed
         self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)
- 
-        # The base frame is base_footprint for the TurtleBot but base_link for Pi Robot
-        self.base_frame = rospy.get_param('~base_frame', '/base_link')
-
-        # The odom frame is usually just /odom
-        self.odom_frame = rospy.get_param('~odom_frame', '/odom')
-
-        # Initialize the tf listener
-        self.tf_listener = tf.TransformListener()
         
-        # Make sure we see the odom and base frames
-        self.tf_listener.waitForTransform(self.odom_frame, self.base_frame, rospy.Time(), rospy.Duration(60.0))        
+        # Variable to hold the current odometry values
+        self.odom = Odometry()
+        
+        # Subscribe to the /odom topic to get odometry data.  Set the callback to the self.odom_update function.
+        rospy.Subscriber('/odom', Odometry, self.update_odom)
+        
+        # Wait for the /odom topic to become available
+        rospy.wait_for_message('/odom', Odometry)
+        
+        # Wait until we actually have some data
+        while self.odom == Odometry():
+            rospy.sleep(1)
             
         rospy.loginfo("Bring up dynamic_reconfigure to control the test.")
   
-        self.position = Point()
-        
-        # Get the starting position from the tf transform between the odom and base frames
-        self.position = self.get_position()
-        
-        x_start = self.position.x
-        y_start = self.position.y
+        odom_start = self.odom
+        x_start = odom_start.pose.pose.position.x
+        y_start = odom_start.pose.pose.position.y
             
         move_cmd = Twist()
             
@@ -87,13 +88,11 @@ class CalibrateLinear():
             move_cmd = Twist()
             
             if not self.target_reached:
-                # Get the current position from the tf transform between the odom and base frames
-                self.position = self.get_position()
-                
                 # Compute the Euclidean distance from the target point
-                distance = sqrt(pow((self.position.x - x_start), 2) +
-                                pow((self.position.y - y_start), 2))
-                                
+                with self.lock:
+                    distance = sqrt(pow((x_start - self.odom.pose.pose.position.x), 2) +
+                                    pow((y_start - self.odom.pose.pose.position.y), 2))
+                
                 # Correct the estimated distance by the correction factor
                 distance *= self.odom_linear_scale_correction
                 
@@ -109,9 +108,9 @@ class CalibrateLinear():
                     # If not, move in the appropriate direction
                     move_cmd.linear.x = copysign(self.speed, -1 * error)
             else:
-                self.position = self.get_position()
-                x_start = self.position.x
-                y_start = self.position.y
+                odom_start = self.odom
+                x_start = odom_start.pose.pose.position.x
+                y_start = odom_start.pose.pose.position.y
                 
             self.cmd_vel.publish(move_cmd)
             r.sleep()
@@ -128,15 +127,9 @@ class CalibrateLinear():
         
         return config
         
-    def get_position(self):
-        # Get the current transform between the odom and base frames
-        try:
-            (trans, rot)  = self.tf_listener.lookupTransform(self.odom_frame, self.base_frame, rospy.Time(0))
-        except (tf.Exception, tf.ConnectivityException, tf.LookupException):
-            rospy.loginfo("TF Exception")
-            return
-
-        return Point(*trans)
+    def update_odom(self, msg):
+        with self.lock:
+            self.odom = msg
         
     def shutdown(self):
         # Always stop the robot when shutting down the node

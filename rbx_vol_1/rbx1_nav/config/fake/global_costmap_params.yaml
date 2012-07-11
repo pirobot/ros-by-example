@@ -1,10 +1,11 @@
 global_costmap:
-   global_frame: map
+   global_frame: odom
    robot_base_frame: base_link
-   update_frequency: 1.0
+   update_frequency: 5.0
    publish_frequency: 1.0
    static_map: true
    rolling_window: false
+   map_type: costmap
 
    
    

@@ -1,19 +1,13 @@
-controller_frequency: 5.0
-#planner_patience: 5.0
-#controller_patience: 15.0
-recovery_behavior_enabled: false
-clearing_rotation_allowed: false
-
+controller_frequency: 1.0
 TrajectoryPlannerROS:
-  max_vel_x: 0.5
-  min_vel_x: 0.1
-  max_vel_theta: 1.2
-  min_vel_theta: 0.2
-  min_in_place_vel_theta: 0.2
-  escape_vel: -0.10
-  acc_lim_x: 1.0
-  acc_lim_y: 1.0
-  acc_lim_th: 2.0
+  max_vel_x: 0.20
+  min_vel_x: 0.0
+  max_vel_theta: 2.0
+  min_vel_theta: 0.0
+  min_in_place_vel_theta: 0.4
+  acc_lim_th: 0.75
+  acc_lim_x: 0.50
+  acc_lim_y: 0.50
 
   holonomic_robot: false
   yaw_goal_tolerance: 0.2 # about 11 degrees
@@ -22,7 +16,7 @@ TrajectoryPlannerROS:
   path_distance_bias: 0.6
 
   heading_lookahead: 0.3
-  meter_scoring: true
+  meter_scoring: false
   heading_scoring: false
   heading_scoring_timestep: 0.1
   oscillation_reset_dist: 0.05
@@ -30,10 +24,10 @@ TrajectoryPlannerROS:
   publish_cost_grid_pc: false
 
   sim_time: 1.7
-  sim_granularity: 0.1
-  angular_sim_granularity: 0.1
+  sim_granularity: 0.025
+  angular_sim_granularity: 0.025
   vx_samples: 20
   vtheta_samples: 20
   dwa: false
   simple_attractor: true
-  
+

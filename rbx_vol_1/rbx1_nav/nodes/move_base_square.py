@@ -43,19 +43,27 @@ class MoveBaseSquare():
         # Create a list to hold the target orientations
         quaternions = list()
         
-        # The first two target orientations are 90 degrees
-        q_turn_angle = quaternion_from_euler(0, 0, pi / 2, axes='sxyz')
+        # The first target orientation is 90 degrees
+        q_turn_angle = quaternion_from_euler(0, 0, pi/2, axes='sxyz')
         q = Quaternion(*q_turn_angle)
         # Append the first turn
         quaternions.append(q)
+        
+        # The second orientation is also 90 degrees
+        q_turn_angle = quaternion_from_euler(0, 0, pi/2, axes='sxyz')
+        q = Quaternion(*q_turn_angle)
         # Append the second turn
         quaternions.append(q)
 
-        # The second two target orientations are 270 degrees
-        q_turn_angle = quaternion_from_euler(0, 0, 3 * pi / 2, axes='sxyz')
+        # The third orientations is 270 degrees
+        q_turn_angle = quaternion_from_euler(0, 0, 3*pi/2, axes='sxyz')
         q = Quaternion(*q_turn_angle)
         # Append the third turn
         quaternions.append(q)
+        
+        # The final orientation is 0 degrees
+        q_turn_angle = quaternion_from_euler(0, 0, 0, axes='sxyz')
+        q = Quaternion(*q_turn_angle)
         # Append the fourth turn
         quaternions.append(q)
         
