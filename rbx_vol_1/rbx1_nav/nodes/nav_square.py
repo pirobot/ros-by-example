@@ -26,8 +26,8 @@ import roslib; roslib.load_manifest('rbx1_nav')
 import rospy
 from geometry_msgs.msg import Twist, Point, Quaternion
 import tf
-from math import radians, copysign, sqrt, pow, pi
 from transform_utils import quat_to_angle, normalize_angle
+from math import radians, copysign, sqrt, pow, pi
 
 class NavSquare():
     def __init__(self):
@@ -38,7 +38,7 @@ class NavSquare():
         rospy.on_shutdown(self.shutdown)
 
         # How fast will we check the odometry values?
-        rate = 50
+        rate = 20
         
         # Set the equivalent ROS rate variable
         r = rospy.Rate(rate)
@@ -62,9 +62,21 @@ class NavSquare():
         # Initialize the tf listener
         self.tf_listener = tf.TransformListener()
         
-        # Make sure we see the odom and base frames
-        self.tf_listener.waitForTransform(self.odom_frame, self.base_frame, rospy.Time(), rospy.Duration(60.0))
+        # Set the odom frame
+        self.odom_frame = '/odom'
         
+        # Find out if the robot uses /base_link or /base_footprint
+        try:
+            self.tf_listener.waitForTransform(self.odom_frame, '/base_footprint', rospy.Time(), rospy.Duration(1.0))
+            self.base_frame = '/base_footprint'
+        except (tf.Exception, tf.ConnectivityException, tf.LookupException):
+            try:
+                self.tf_listener.waitForTransform(self.odom_frame, '/base_link', rospy.Time(), rospy.Duration(1.0))
+                self.base_frame = '/base_link'
+            except (tf.Exception, tf.ConnectivityException, tf.LookupException):
+                rospy.loginfo("Cannot find transform between /odom and /base_link or /base_footprint")
+                rospy.signal_shutdown("tf Exception")  
+                
         # Initialize the position variable as a Point type
         position = Point()
 

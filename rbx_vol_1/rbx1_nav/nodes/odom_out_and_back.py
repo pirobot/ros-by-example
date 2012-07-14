@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 """ odom_out_and_back.py - Version 0.1 2012-03-24
@@ -25,10 +26,9 @@
 import roslib; roslib.load_manifest('rbx1_nav')
 import rospy
 from geometry_msgs.msg import Twist, Point, Quaternion
-from nav_msgs.msg import Odometry
 import tf
-from math import radians, copysign, sqrt, pow, pi
 from transform_utils import quat_to_angle, normalize_angle
+from math import radians, copysign, sqrt, pow, pi
 
 class OutAndBack():
     def __init__(self):
@@ -42,7 +42,7 @@ class OutAndBack():
         self.cmd_vel = rospy.Publisher('/cmd_vel', Twist)
         
         # How fast will we update the robot's movement?
-        rate = 100
+        rate = 20
         
         # Set the equivalent ROS rate variable
         r = rospy.Rate(rate)
@@ -57,22 +57,28 @@ class OutAndBack():
         angular_speed = 1.0
         
         # Set the angular tolerance in degrees converted to radians
-        angular_tolerance = radians(2)
+        angular_tolerance = radians(2.5)
         
         # Set the rotation angle to Pi radians (180 degrees)
         goal_angle = pi
-        
-        # The base frame is base_footprint for the TurtleBot but base_link for Pi Robot
-        self.base_frame = rospy.get_param('~base_frame', '/base_link')
-
-        # The odom frame is usually just /odom
-        self.odom_frame = rospy.get_param('~odom_frame', '/odom')
 
         # Initialize the tf listener
         self.tf_listener = tf.TransformListener()
         
-        # Make sure we see the odom and base frames
-        self.tf_listener.waitForTransform(self.odom_frame, self.base_frame, rospy.Time(), rospy.Duration(60.0))
+        # Set the odom frame
+        self.odom_frame = '/odom'
+        
+        # Find out if the robot uses /base_link or /base_footprint
+        try:
+            self.tf_listener.waitForTransform(self.odom_frame, '/base_footprint', rospy.Time(), rospy.Duration(1.0))
+            self.base_frame = '/base_footprint'
+        except (tf.Exception, tf.ConnectivityException, tf.LookupException):
+            try:
+                self.tf_listener.waitForTransform(self.odom_frame, '/base_link', rospy.Time(), rospy.Duration(1.0))
+                self.base_frame = '/base_link'
+            except (tf.Exception, tf.ConnectivityException, tf.LookupException):
+                rospy.loginfo("Cannot find transform between /odom and /base_link or /base_footprint")
+                rospy.signal_shutdown("tf Exception")  
         
         # Initialize the position variable as a Point type
         position = Point()

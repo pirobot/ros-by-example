@@ -13,7 +13,7 @@
   <!-- Turtlebot Driver -->
   <node pkg="turtlebot_node" type="turtlebot_node.py" name="turtlebot_node" output="screen" respawn="true" args="--respawnable">
     <param name="bonus" value="false" />
-    <param name="update_rate" value="30.0" />
+    <param name="update_rate" value="20.0" />
     <param name="publish_tf" value="false"/>
   </node>
 

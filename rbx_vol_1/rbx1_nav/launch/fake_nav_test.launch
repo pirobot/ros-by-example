@@ -1,5 +1,7 @@
 <launch>
 
+  <param name="use_sim_time" value="false" />
+
   <!-- Start the ArbotiX controller -->
   <include file="$(find rbx1_bringup)/launch/fake_turtlebot.launch" />
 

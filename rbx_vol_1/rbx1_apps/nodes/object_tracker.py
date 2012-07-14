@@ -99,6 +99,10 @@ class ObjectTracker():
             r.sleep()
 
     def set_cmd_vel(self, msg):
+        # If the ROI has a width or height of 0, we have lost the target
+        if msg.width == 0 or msg.height == 0:
+            return
+        
         # If the ROI stops updating this next statement will not happen
         self.target_visible = True
 
@@ -115,7 +119,6 @@ class ObjectTracker():
             # Set the rotation speed proportional to the displacement of the target
             try:
                 speed = self.gain * percent_offset_x
-                rospy.loginfo(speed)
                 if speed < 0:
                     direction = -1
                 else:

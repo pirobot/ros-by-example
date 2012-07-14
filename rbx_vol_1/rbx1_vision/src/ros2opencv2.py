@@ -83,8 +83,8 @@ class ROS2OpenCV2(object):
         self.cps_values = list()
         self.cps_n_values = 20
         self.busy = False
-        self.resize_window_width = 640
-        self.resize_window_height = 480
+        self.resize_window_width = 0
+        self.resize_window_height = 0
         
         # Create the main display window
         self.cv_window_name = self.node_name

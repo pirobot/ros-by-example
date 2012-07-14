@@ -1,4 +1,6 @@
-<launch>	
+<launch>
+    <param name="/use_sim_time" value="false" />
+
     <!-- Load the URDF/Xacro model of our robot -->
 	<param name="robot_description" command="$(find xacro)/xacro.py '$(find rbx1_dynamixels)/urdf/pi_turtlebot.xacro'" />
 

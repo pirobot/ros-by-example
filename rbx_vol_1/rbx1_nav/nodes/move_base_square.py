@@ -40,32 +40,17 @@ class MoveBaseSquare():
         # How big is the square we want the robot to navigate?
         square_size = rospy.get_param("~square_size", 1.0) # meters
         
-        # Create a list to hold the target orientations
+        # Create a list to hold the target quaternions (orientations)
         quaternions = list()
         
-        # The first target orientation is 90 degrees
-        q_turn_angle = quaternion_from_euler(0, 0, pi/2, axes='sxyz')
-        q = Quaternion(*q_turn_angle)
-        # Append the first turn
-        quaternions.append(q)
+        # First define the corner orientations as Euler angles
+        euler_angles = (pi/2, pi, 3*pi/2, 0)
         
-        # The second orientation is 180 degrees
-        q_turn_angle = quaternion_from_euler(0, 0, pi, axes='sxyz')
-        q = Quaternion(*q_turn_angle)
-        # Append the second turn
-        quaternions.append(q)
-
-        # The third orientations is 270 degrees
-        q_turn_angle = quaternion_from_euler(0, 0, 3*pi/2, axes='sxyz')
-        q = Quaternion(*q_turn_angle)
-        # Append the third turn
-        quaternions.append(q)
-        
-        # The final orientation is 0 degrees
-        q_turn_angle = quaternion_from_euler(0, 0, 0, axes='sxyz')
-        q = Quaternion(*q_turn_angle)
-        # Append the fourth turn
-        quaternions.append(q)
+        # Then convert the angles to quaternions
+        for angle in euler_angles:
+            q_angle = quaternion_from_euler(0, 0, angle, axes='sxyz')
+            q = Quaternion(*q_angle)
+            quaternions.append(q)
         
         # Create a list to hold the waypoint poses
         waypoints = list()

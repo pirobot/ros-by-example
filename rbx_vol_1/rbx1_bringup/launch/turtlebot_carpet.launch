@@ -1,6 +1,6 @@
 <launch>
 
-  <!-- sample file, copy this to /etc/ros/electric/turtlebot.launch -->
+  <param name="/use_sim_time" value="false" />
 
   <param name="turtlebot_node/gyro_scale_correction" value="1.42"/>
   <param name="turtlebot_node/odom_angular_scale_correction" value="0.96073"/>

@@ -29,8 +29,8 @@ Original\ PointCloud.Style=0
 Original\ PointCloud.Topic=/camera/rgb/points
 Original\ PointCloud..AxisAutocompute\ Value\ Bounds=1
 Original\ PointCloud..AxisAxis=2
-Original\ PointCloud..AxisMax\ Value=1.26735
-Original\ PointCloud..AxisMin\ Value=-1.24696
+Original\ PointCloud..AxisMax\ Value=1.46917
+Original\ PointCloud..AxisMin\ Value=-1.37829
 Original\ PointCloud..AxisUse\ Fixed\ Frame=1
 Original\ PointCloud..Flat\ ColorColorR=1
 Original\ PointCloud..Flat\ ColorColorG=1
@@ -57,8 +57,8 @@ PassThrough.Style=0
 PassThrough.Topic=/passthrough
 PassThrough..AxisAutocompute\ Value\ Bounds=1
 PassThrough..AxisAxis=2
-PassThrough..AxisMax\ Value=0.235082
-PassThrough..AxisMin\ Value=-0.515337
+PassThrough..AxisMax\ Value=-0.253
+PassThrough..AxisMin\ Value=-0.440604
 PassThrough..AxisUse\ Fixed\ Frame=1
 PassThrough..Flat\ ColorColorR=1
 PassThrough..Flat\ ColorColorG=1
@@ -105,8 +105,8 @@ Voxel\ Grid..IntensityUse\ full\ RGB\ spectrum=0
 Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::OrbitViewController
-Camera\ Config=1.451 1.72721 2.47793 -0.255259 -0.0381333 -1.45344
-Property\ Grid\ State=selection=Original PointCloud.Enabled;expanded=Voxel Grid.Enabled.Voxel Grid.StatusTopStatus;scrollpos=0,0;splitterpos=132,266;ispageselected=1
+Camera\ Config=1.451 1.72721 2.93311 -0.255259 -0.0381333 -1.45344
+Property\ Grid\ State=selection=Voxel Grid.Enabled;expanded=.Global Options;scrollpos=0,0;splitterpos=200,402;ispageselected=1
 [Display0]
 Name=Grid
 Package=rviz

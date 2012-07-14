@@ -64,6 +64,7 @@ class VIDEO2ROS:
         
         # Initialize a few variables
         self.paused = self.start_paused
+        self.loop_video = True
         self.keystroke = None
         self.restart = False
         self.last_frame = None

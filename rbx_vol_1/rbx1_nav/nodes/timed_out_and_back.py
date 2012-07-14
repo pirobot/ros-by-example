@@ -75,7 +75,7 @@ class OutAndBack():
             
             for t in range(ticks):
                 self.cmd_vel.publish(move_cmd)
-                r.sleep()      
+                r.sleep()
             
             # Stop the robot before the rotation
             move_cmd = Twist()
@@ -99,7 +99,7 @@ class OutAndBack():
             self.cmd_vel.publish(move_cmd)
             rospy.sleep(1)    
             
-        # Stop the robot for good
+        # Stop the robot
         self.cmd_vel.publish(Twist())
         
     def shutdown(self):
