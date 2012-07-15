@@ -64,7 +64,7 @@ class OutAndBack():
      
         # Loop through the two legs of the trip  
         for i in range(2):
-            # Intialize the movement command
+            # Initialize the movement command
             move_cmd = Twist()
             
             # Set the forward speed
