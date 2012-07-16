@@ -97,7 +97,7 @@ Odometry.ColorR=0.870588
 Odometry.ColorG=0.784314
 Odometry.ColorB=0.0588235
 Odometry.Enabled=1
-Odometry.Keep=100
+Odometry.Keep=10
 Odometry.Position\ Tolerance=0.1
 Odometry.Topic=/odom
 Robot\ Model.Alpha=1
@@ -170,8 +170,8 @@ Robot\:\ Robot\ Model\ Link\ standoff_kinect_1_linkShow\ Trail=0
 Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::FixedOrientationOrthoViewController
-Camera\ Config=151.376 -0.646354 4.82881 -0.604477 -0.707107 -3.31053e-11 1.67439e-09 0.707107
-Property\ Grid\ State=selection=;expanded=.Global Options,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=150,301;ispageselected=1
+Camera\ Config=60.9729 -2.63867 4.82881 1.22833 -0.707107 -3.31053e-11 1.67439e-09 0.707107
+Property\ Grid\ State=selection=Odometry.Enabled.Odometry.Angle Tolerance;expanded=.Global Options,Odometry.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=141,284;ispageselected=1
 [Display0]
 Name=Grid
 Package=rviz

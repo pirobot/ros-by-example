@@ -56,12 +56,12 @@ class FaceTracker(FaceDetector, LKTracker):
         if self.detect_box is None:
             self.detect_box = self.detect_face(self.grey)    
         else:
-            # Step 2: If we aren't yet tracking keypoints, get them now
+            # STEP 2: If we aren't yet tracking keypoints, get them now
             if self.track_box is None or not self.is_rect_nonzero(self.track_box):
                 self.track_box = self.detect_box
                 self.keypoints = self.get_keypoints(self.grey, self.track_box)
             
-            # Step 3: If we have keypoints, track them using optical flow
+            # STEP 3: If we have keypoints, track them using optical flow
             if len(self.keypoints) > 0:
                 # Store a copy of the current grey image used for LK tracking 
                 if self.prev_grey is None:

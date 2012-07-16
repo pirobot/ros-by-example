@@ -87,7 +87,7 @@ class OutAndBack():
             # Set the angular speed
             move_cmd.angular.z = angular_speed
 
-            # Roate for a time to go 180 degrees
+            # Rotate for a time to go 180 degrees
             ticks = int(goal_angle * rate)
             
             for t in range(ticks):           
