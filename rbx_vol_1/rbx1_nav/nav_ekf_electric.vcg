@@ -43,7 +43,7 @@ Inflated\ Obstacles.Enabled=1
 Inflated\ Obstacles.Topic=/move_base/local_costmap/inflated_obstacles
 Laser\ Scan.Alpha=1
 Laser\ Scan.Billboard\ Size=0.01
-Laser\ Scan.Color\ Transformer=Intensity
+Laser\ Scan.Color\ Transformer=Axis
 Laser\ Scan.Decay\ Time=0
 Laser\ Scan.Enabled=1
 Laser\ Scan.Position\ Transformer=XYZ
@@ -52,8 +52,8 @@ Laser\ Scan.Style=0
 Laser\ Scan.Topic=/scan
 Laser\ Scan..AxisAutocompute\ Value\ Bounds=1
 Laser\ Scan..AxisAxis=2
-Laser\ Scan..AxisMax\ Value=10
-Laser\ Scan..AxisMin\ Value=-10
+Laser\ Scan..AxisMax\ Value=0.303857
+Laser\ Scan..AxisMin\ Value=0.303857
 Laser\ Scan..AxisUse\ Fixed\ Frame=1
 Laser\ Scan..Flat\ ColorColorR=1
 Laser\ Scan..Flat\ ColorColorG=1
@@ -180,7 +180,7 @@ Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::FixedOrientationOrthoViewController
 Camera\ Config=181.8 -0.515855 4.82881 -0.52064 -0.707107 -3.31053e-11 1.67439e-09 0.707107
-Property\ Grid\ State=selection=.Global Options;expanded=.Global Options,Odometry EKF.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=147,295;ispageselected=1
+Property\ Grid\ State=selection=Odometry EKF.Enabled;expanded=.Global Options,Odometry EKF.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=147,295;ispageselected=1
 [Display0]
 Name=Grid
 Package=rviz

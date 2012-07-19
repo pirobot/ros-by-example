@@ -30,11 +30,17 @@ class Relax():
         
         # Set the default speed to something small
         for set_speed in speed_services:
-            set_speed(0.1)
+            try:
+                set_speed(0.1)
+            except:
+                pass
 
         # Relax all servos to give them a rest.
         for torque_enable in torque_services:
-            torque_enable(False)
+            try:
+                torque_enable(False)
+            except:
+                pass
         
 if __name__=='__main__':
     Relax()

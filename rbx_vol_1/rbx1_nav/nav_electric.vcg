@@ -81,7 +81,6 @@ Map.Enabled=1
 Map.Topic=/map
 Marker.Enabled=1
 Marker.Marker\ Topic=/waypoint_markers
-Marker.waypoints=1
 Mouse\ Goal\ Pose.Alpha=1
 Mouse\ Goal\ Pose.ColorR=0.0156863
 Mouse\ Goal\ Pose.ColorG=0.8
@@ -97,7 +96,7 @@ Odometry\ EKF.Angle\ Tolerance=0.05
 Odometry\ EKF.ColorR=1
 Odometry\ EKF.ColorG=0.643137
 Odometry\ EKF.ColorB=0
-Odometry\ EKF.Enabled=1
+Odometry\ EKF.Enabled=0
 Odometry\ EKF.Keep=100
 Odometry\ EKF.Position\ Tolerance=0.1
 Odometry\ EKF.Topic=/odom_ekf
@@ -105,7 +104,7 @@ Odometry.Angle\ Tolerance=0.1
 Odometry.ColorR=0.870588
 Odometry.ColorG=0.784314
 Odometry.ColorB=0.0588235
-Odometry.Enabled=0
+Odometry.Enabled=1
 Odometry.Keep=100
 Odometry.Position\ Tolerance=0.1
 Odometry.Topic=/odom
@@ -180,7 +179,7 @@ Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::FixedOrientationOrthoViewController
 Camera\ Config=181.8 -0.515855 4.82881 -0.52064 -0.707107 -3.31053e-11 1.67439e-09 0.707107
-Property\ Grid\ State=selection=.Global Options;expanded=.Global Options,Odometry EKF.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=147,295;ispageselected=1
+Property\ Grid\ State=selection=Odometry EKF.Enabled;expanded=.Global Options,Odometry.Enabled,Marker.Enabled.Marker.Namespaces;scrollpos=0,0;splitterpos=147,295;ispageselected=1
 [Display0]
 Name=Grid
 Package=rviz
