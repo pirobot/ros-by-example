@@ -19,9 +19,9 @@ Grid.Plane=0
 Grid.Plane\ Cell\ Count=30
 Grid.Reference\ Frame=<Fixed Frame>
 Odometry\ EKF.Angle\ Tolerance=0.1
-Odometry\ EKF.ColorR=0.0470588
-Odometry\ EKF.ColorG=0.690196
-Odometry\ EKF.ColorB=0.152941
+Odometry\ EKF.ColorR=0.992157
+Odometry\ EKF.ColorG=0.490196
+Odometry\ EKF.ColorB=0
 Odometry\ EKF.Enabled=0
 Odometry\ EKF.Keep=100
 Odometry\ EKF.Position\ Tolerance=0.1
@@ -105,7 +105,7 @@ Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::FixedOrientationOrthoViewController
 Camera\ Config=179.668 -0.541221 1.89665 -0.780341 -0.707107 2.36136e-09 3.68075e-09 0.707107
-Property\ Grid\ State=selection=;expanded=Odometry.Enabled,Robot: Robot Model Link base_footprintbase_footprint,Robot: Robot Model Link base_linkbase_link;scrollpos=0,0;splitterpos=206,306;ispageselected=1
+Property\ Grid\ State=selection=Odometry.Enabled;expanded=Odometry.Enabled;scrollpos=0,0;splitterpos=160,266;ispageselected=1
 [Display0]
 Name=Grid
 Package=rviz

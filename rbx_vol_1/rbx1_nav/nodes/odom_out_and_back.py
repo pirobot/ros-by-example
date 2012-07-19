@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 """ odom_out_and_back.py - Version 0.1 2012-03-24

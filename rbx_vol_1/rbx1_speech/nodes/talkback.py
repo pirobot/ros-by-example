@@ -83,4 +83,4 @@ if __name__=="__main__":
         TalkBack(sys.path[0])
         rospy.spin()
     except rospy.ROSInterruptException:
-        rospy.loginfo("AMCL navigation test finished.")
+        rospy.loginfo("Talkback node terminated.")

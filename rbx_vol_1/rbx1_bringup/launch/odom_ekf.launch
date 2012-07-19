@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="rbx1_bringup" type="odom_ekf.py" name="odom_ekf" output="screen">
+    <remap from="input" to="/robot_pose_ekf/odom"/>
+    <remap from="output" to="/odom_ekf"/>
+  </node>
+</launch>

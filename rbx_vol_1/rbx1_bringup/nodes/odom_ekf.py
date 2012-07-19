@@ -42,6 +42,8 @@ class OdomEKF():
         # Subscribe to the /robot_pose_ekf/odom_combined topic
         rospy.Subscriber('input', PoseWithCovarianceStamped, self.pub_ekf_odom)
         
+        rospy.loginfo("Publishing combined odometry on /odom_ekf")
+        
     def pub_ekf_odom(self, msg):
         odom = Odometry()
         odom.header = msg.header
