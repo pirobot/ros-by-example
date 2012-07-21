@@ -10,6 +10,6 @@
   <include file="$(find rbx1_nav)/launch/tb_move_base.launch" />
   
   <!-- Run the TurtleBot AMCL file -->
-  <include file="$(find turtlebot_navigation)/config/amcl.launch" />
+  <include file="$(find turtlebot_navigation)/config/amcl_turtlebot.launch" />
   
 </launch>

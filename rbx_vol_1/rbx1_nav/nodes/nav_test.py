@@ -93,12 +93,11 @@ class NavTest():
         location = ""
         last_location = ""
         
-        # Get the initial pose from the user unless this is a simulated test
-        if not self.fake_test:
-            rospy.loginfo("Click on the map in RViz to set the intial pose...")
-            rospy.wait_for_message('initialpose', PoseWithCovarianceStamped)
-            self.last_location = Pose()
-            rospy.Subscriber('initialpose', PoseWithCovarianceStamped, self.update_initial_pose)
+        # Get the initial pose from the user
+        rospy.loginfo("*** Click the 2D Pose Estimate button in RViz to set the robot's initial pose...")
+        rospy.wait_for_message('initialpose', PoseWithCovarianceStamped)
+        self.last_location = Pose()
+        rospy.Subscriber('initialpose', PoseWithCovarianceStamped, self.update_initial_pose)
         
         # Make sure we have the initial pose
         while initial_pose.header.stamp == "":
