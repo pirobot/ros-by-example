@@ -11,6 +11,9 @@
       <param name="sim" value="true"/>
   </node>
   
+  <!-- Move the arm into a more natural starting position -->
+  <node name="move_fake_pi_arm_start" pkg="rbx1_bringup" type="move_fake_pi_arm_start.py" output="screen" />
+
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
       <param name="publish_frequency" type="double" value="20.0" />
   </node>
