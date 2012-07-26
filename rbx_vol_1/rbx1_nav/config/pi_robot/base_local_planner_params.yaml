@@ -18,8 +18,8 @@ TrajectoryPlannerROS:
   holonomic_robot: false
   yaw_goal_tolerance: 0.2 # about 11 degrees
   xy_goal_tolerance: 0.05 # 10 cm
-  gdist_scale: 0.8
-  pdist_scale: 0.6
+  goal_distance_bias: 0.8
+  path_distance_bias: 0.6
 
   heading_lookahead: 0.3
   meter_scoring: false
