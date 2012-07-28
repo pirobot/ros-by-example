@@ -17,14 +17,14 @@ TrajectoryPlannerROS:
 
   holonomic_robot: false
   yaw_goal_tolerance: 0.2 # about 11 degrees
-  xy_goal_tolerance: 0.05 # 10 cm
+  xy_goal_tolerance: 0.1 # 10 cm
   gdist_scale: 0.8
   pdist_scale: 0.6
 
   heading_lookahead: 0.3
-  meter_scoring: false
   heading_scoring: false
   heading_scoring_timestep: 0.1
+  meter_scoring: false
   oscillation_reset_dist: 0.05
   occdist_scale: 0.05
   publish_cost_grid_pc: false

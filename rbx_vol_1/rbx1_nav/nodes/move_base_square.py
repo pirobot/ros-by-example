@@ -129,11 +129,11 @@ class MoveBaseSquare():
                     
     def init_markers(self):
         # Set up our waypoint markers
-        marker_scale = 0.15
+        marker_scale = 0.2
         marker_lifetime = 0 # 0 is forever
         marker_ns = 'waypoints'
         marker_id = 0
-        marker_color = {'r': 1.0, 'g': 0.0, 'b': 0.0, 'a': 1.0}
+        marker_color = {'r': 1.0, 'g': 0.7, 'b': 1.0, 'a': 1.0}
         
         # Define a marker publisher.
         self.marker_pub = rospy.Publisher('waypoint_markers', Marker)

@@ -1,4 +1,4 @@
-controller_frequency: 5.0
+controller_frequency: 3.0
 recovery_behavior_enabled: true
 clearing_rotation_allowed: true
 
@@ -22,9 +22,9 @@ TrajectoryPlannerROS:
   pdist_scale: 0.6
 
   heading_lookahead: 0.3
-  meter_scoring: false
   heading_scoring: false
   heading_scoring_timestep: 0.1
+  meter_scoring: false
   oscillation_reset_dist: 0.05
   occdist_scale: 0.05
   publish_cost_grid_pc: false
@@ -32,7 +32,7 @@ TrajectoryPlannerROS:
   sim_time: 1.7
   sim_granularity: 0.025
   angular_sim_granularity: 0.025
-  vx_samples: 6
+  vx_samples: 8
   vtheta_samples: 20
   dwa: true
   simple_attractor: false
