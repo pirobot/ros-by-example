@@ -25,12 +25,15 @@ import roslib; roslib.load_manifest('rbx1_bringup')
 import rospy
 
 from std_msgs.msg import Float64
+from sensor_msgs.msg import JointState
 
 if __name__ == '__main__':
     rospy.init_node('move_fake_pi_arm_start')
 
     lift = rospy.Publisher('arm_shoulder_lift_joint/command', Float64)
     elbow = rospy.Publisher('arm_elbow_flex_joint/command', Float64)
+    
+    rospy.wait_for_message('joint_states', JointState)
     
     for i in range(3):
         lift.publish(Float64(2.62))
