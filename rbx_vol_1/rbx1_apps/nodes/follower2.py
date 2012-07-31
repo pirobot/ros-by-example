@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
 """
-    follower.py - Version 1.0 2012-06-01
+    follower2.py - Version 1.0 2012-06-01
     
     Follow a "person" by tracking the nearest object in x-y-z space.
+    
+    Relies on PCL ROS nodelets in the launch fileto pre-filter the
+    cloud on the x, y and z dimensions.
     
     Based on the follower application by Tony Pratkanis at:
     
@@ -93,11 +96,15 @@ class Follower():
         # Stop the robot by default
         move_cmd = Twist()
         
+        rospy.loginfo(n)
+        
         # If we have points, compute the centroid coordinates
-        if n:    
+        if n:
             x /= n 
             y /= n 
             z /= n
+            
+            #rospy.loginfo(z)
                         
             # Check our movement thresholds
             if (abs(z - self.goal_z) > self.z_threshold) or (abs(x) > self.x_threshold):     

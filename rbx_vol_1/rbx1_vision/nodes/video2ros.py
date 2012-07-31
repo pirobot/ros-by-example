@@ -29,7 +29,7 @@ import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
-class VIDEO2ROS:
+class Video2ROS:
     def __init__(self):
         rospy.init_node('video2ros', anonymous=False)
         
@@ -191,7 +191,7 @@ def main(args):
     print help_message
     
     try:
-        v2r = VIDEO2ROS()
+        v2r = Video2ROS()
     except KeyboardInterrupt:
         print "Shutting down video2ros..."
         cv2.destroyAllWindows()
