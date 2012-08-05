@@ -50,7 +50,7 @@ class CalibrateAngular():
         self.speed = rospy.get_param('~speed', 0.7) # radians per second
         self.tolerance = rospy.get_param('tolerance', radians(5)) # degrees converted to radians
         self.odom_angular_scale_correction = rospy.get_param('~odom_angular_scale_correction', 1.0)
-        self.target_reached = rospy.get_param('~target_reached', False)
+        self.start_test = rospy.get_param('~start_test', False)
         
         # Fire up the dynamic_reconfigure server
         dyn_server = Server(CalibrateAngularConfig, self.dynamic_reconfigure_callback)
@@ -80,7 +80,7 @@ class CalibrateAngular():
         while not rospy.is_shutdown():
             # Execute the rotation
 
-            if not self.target_reached:
+            if self.start_test:
                 # Get the current rotation angle from tf
                 self.odom_angle = self.get_odom_angle()
                 
@@ -113,8 +113,8 @@ class CalibrateAngular():
                 self.cmd_vel.publish(Twist())
                 
                 # Update the status flag
-                self.target_reached = True
-                params = {'target_reached': 'True'}
+                self.start_test = False
+                params = {'start_test': 'False'}
                 dyn_client.update_configuration(params)
                 
             rospy.sleep(0.5) 
@@ -138,7 +138,7 @@ class CalibrateAngular():
         self.speed = config['speed']
         self.tolerance = radians(config['tolerance'])
         self.odom_angular_scale_correction = config['odom_angular_scale_correction']
-        self.target_reached = config['target_reached']
+        self.start_test = config['start_test']
         
         return config
         

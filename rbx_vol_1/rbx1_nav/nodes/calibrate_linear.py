@@ -47,7 +47,7 @@ class CalibrateLinear():
         self.speed = rospy.get_param('~speed', 0.15) # meters per second
         self.tolerance = rospy.get_param('~tolerance', 0.01) # meters
         self.odom_linear_scale_correction = rospy.get_param('~odom_linear_scale_correction', 1.0)
-        self.target_reached = rospy.get_param('~target_reached', False)
+        self.start_test = rospy.get_param('~start_test', False)
         
         # Fire up the dynamic_reconfigure server
         dyn_server = Server(CalibrateLinearConfig, self.dynamic_reconfigure_callback)
@@ -86,7 +86,7 @@ class CalibrateLinear():
             # Stop the robot by default
             move_cmd = Twist()
             
-            if not self.target_reached:
+            if self.start_test:
                 # Get the current position from the tf transform between the odom and base frames
                 self.position = self.get_position()
                 
@@ -101,9 +101,9 @@ class CalibrateLinear():
                 error =  distance - self.test_distance
                 
                 # Are we close enough?
-                if self.target_reached or abs(error) <  self.tolerance:
-                    self.target_reached = True
-                    params = {'target_reached': 'True'}
+                if not self.start_test or abs(error) <  self.tolerance:
+                    self.start_test = False
+                    params = {'start_test': 'False'}
                     dyn_client.update_configuration(params)
                 else:
                     # If not, move in the appropriate direction
@@ -124,7 +124,7 @@ class CalibrateLinear():
         self.speed = config['speed']
         self.tolerance = config['tolerance']
         self.odom_linear_scale_correction = config['odom_linear_scale_correction']
-        self.target_reached = config['target_reached']
+        self.start_test = config['start_test']
         
         return config
         

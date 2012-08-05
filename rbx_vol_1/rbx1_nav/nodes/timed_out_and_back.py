@@ -70,7 +70,7 @@ class OutAndBack():
             # Set the forward speed
             move_cmd.linear.x = linear_speed
             
-            # Move forward for a time to go 1 meter
+            # Move forward for a time to go the desired distance
             ticks = int(linear_duration * rate)
             
             for t in range(ticks):

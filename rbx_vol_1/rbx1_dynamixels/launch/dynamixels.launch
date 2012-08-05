@@ -24,7 +24,7 @@
       </rosparam>
    </node>
    
-    <!-- Load joint controller configuration from YAML file to parameter server -->
+    <!-- Load the joint controller configuration from a YAML file -->
     <rosparam file="$(find rbx1_dynamixels)/config/dynamixel_params.yaml" command="load"/>
 
    <!-- Start the head pan and tilt controllers -->
@@ -43,6 +43,6 @@
    <!-- Start all Dynamixels in the relaxed state -->
    <node pkg="rbx1_dynamixels" type="relax_all_servos.py" name="relax_all_servos" />
   
-   <!-- Publish a static transform between the robot base and the world frame -->
+   <!-- Elevate the robot 3.25 cm above the ground -->
    <node pkg="tf" type="static_transform_publisher" name="world_base_broadcaster" args="0 0 0.0325 0 0 0 /world /base_link 100" />
 </launch>
