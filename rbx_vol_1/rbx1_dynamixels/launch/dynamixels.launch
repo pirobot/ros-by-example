@@ -42,7 +42,5 @@
 
    <!-- Start all Dynamixels in the relaxed state -->
    <node pkg="rbx1_dynamixels" type="relax_all_servos.py" name="relax_all_servos" />
-  
-   <!-- Elevate the robot 3.25 cm above the ground -->
-   <node pkg="tf" type="static_transform_publisher" name="world_base_broadcaster" args="0 0 0.0325 0 0 0 /world /base_link 100" />
+   
 </launch>
