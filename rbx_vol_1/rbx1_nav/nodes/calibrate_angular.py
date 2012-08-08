@@ -50,7 +50,7 @@ class CalibrateAngular():
         self.speed = rospy.get_param('~speed', 0.7) # radians per second
         self.tolerance = rospy.get_param('tolerance', radians(5)) # degrees converted to radians
         self.odom_angular_scale_correction = rospy.get_param('~odom_angular_scale_correction', 1.0)
-        self.start_test = rospy.get_param('~start_test', False)
+        self.start_test = rospy.get_param('~start_test', True)
         
         # Fire up the dynamic_reconfigure server
         dyn_server = Server(CalibrateAngularConfig, self.dynamic_reconfigure_callback)
@@ -114,7 +114,7 @@ class CalibrateAngular():
                 
                 # Update the status flag
                 self.start_test = False
-                params = {'start_test': 'False'}
+                params = {'start_test': False}
                 dyn_client.update_configuration(params)
                 
             rospy.sleep(0.5) 

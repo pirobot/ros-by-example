@@ -47,7 +47,7 @@ class CalibrateLinear():
         self.speed = rospy.get_param('~speed', 0.15) # meters per second
         self.tolerance = rospy.get_param('~tolerance', 0.01) # meters
         self.odom_linear_scale_correction = rospy.get_param('~odom_linear_scale_correction', 1.0)
-        self.start_test = rospy.get_param('~start_test', False)
+        self.start_test = rospy.get_param('~start_test', True)
         
         # Fire up the dynamic_reconfigure server
         dyn_server = Server(CalibrateLinearConfig, self.dynamic_reconfigure_callback)
@@ -103,7 +103,8 @@ class CalibrateLinear():
                 # Are we close enough?
                 if not self.start_test or abs(error) <  self.tolerance:
                     self.start_test = False
-                    params = {'start_test': 'False'}
+                    params = {'start_test': False}
+                    rospy.loginfo(params)
                     dyn_client.update_configuration(params)
                 else:
                     # If not, move in the appropriate direction
