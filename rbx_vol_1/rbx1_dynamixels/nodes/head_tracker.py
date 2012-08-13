@@ -37,8 +37,8 @@ class HeadTracker():
         self.rate = rospy.get_param("~rate", 10)
         r = rospy.Rate(self.rate)
         
-        # The dynamixels parameter needs to be set by the servo controller
-        self.dynamixels = rospy.get_param('/dynamixels', '')
+        # The joints parameter needs to be set by the servo controller
+        self.joints = rospy.get_param('~joints', '')
         
         # What are the names of the pan and tilt joint in the list of dynamixels?
         self.head_pan_joint = 'head_pan_joint'
@@ -140,8 +140,8 @@ class HeadTracker():
                     try:
                         current_pan_position = seself.tilt_speedlf.joint_state.position[self.joint_state.name.index(self.head_pan_joint)]
                         self.set_servo_position(self.head_pan_joint, current_pan_position)
-                        rospy.loginfo("Servo SetSpeed Exception!")
-                        rospy.loginfo(sys.exc_info())
+                        rospy.logerr("Servo SetSpeed Exception!")
+                        rospy.logerr(sys.exc_info())
                     except:
                         pass
                                  
@@ -157,8 +157,8 @@ class HeadTracker():
                     try:
                         current_tilt_position = self.joint_state.position[self.joint_state.name.index(self.head_tilt_joint)]
                         self.set_servo_position(self.head_tilt_joint, current_tilt_position)
-                        rospy.loginfo("Servo SetSpeed Exception!")
-                        rospy.loginfo(sys.exc_info())
+                        rospy.logerr("Servo SetSpeed Exception!")
+                        rospy.logerr(sys.exc_info())
                     except:
                         pass
                                     
@@ -174,30 +174,28 @@ class HeadTracker():
         # define a position publisher for each servo
         rospy.loginfo("Waiting for joint controllers services...")
         
-        for name in sorted(self.dynamixels):
+        for controller in sorted(self.joints):
             try:
-                controller = name.replace("_joint", "") + "_controller"
-
                 # The set_speed services
                 set_speed_service = '/' + controller + '/set_speed'
                 rospy.wait_for_service(set_speed_service)  
-                self.servo_speed[name] = rospy.ServiceProxy(set_speed_service, SetSpeed, persistent=True)
+                self.servo_speed[controller] = rospy.ServiceProxy(set_speed_service, SetSpeed, persistent=True)
                 
                 # Initialize the servo speed to the default_joint_speed
-                self.servo_speed[name](self.default_joint_speed)
+                self.servo_speed[controller](self.default_joint_speed)
                 
                 # Torque enable/disable control for each servo
                 torque_service = '/' + controller + '/torque_enable'
                 rospy.wait_for_service(torque_service) 
-                self.torque_enable[name] = rospy.ServiceProxy(torque_service, TorqueEnable)
+                self.torque_enable[controller] = rospy.ServiceProxy(torque_service, TorqueEnable)
                 
                 # Start each servo in the disabled state so we can move them by hand
-                self.torque_enable[name](False)
+                self.torque_enable[controller](False)
 
                 # The position controllers
-                self.servo_position[name] = rospy.Publisher('/' + controller + '/command', Float64)
+                self.servo_position[controller] = rospy.Publisher('/' + controller + '/command', Float64)
             except:
-                rospy.loginfo("Can't contact servo services!")
+                rospy.logerr("Can't contact servo services!")
         
         self.pan_position = 0
         self.tilt_position = 0

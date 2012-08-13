@@ -33,8 +33,8 @@
         args="--manager=turtlebot_dynamixel_manager
               --port=dynamixel_ax12
               --type=simple
-        head_pan_controller
-        head_tilt_controller"
+        head_pan_joint
+        head_tilt_joint"
         output="screen" />
 
    <!-- Start the Dynamixel Joint States Publisher -->

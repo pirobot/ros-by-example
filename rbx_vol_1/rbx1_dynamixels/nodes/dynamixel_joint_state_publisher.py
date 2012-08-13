@@ -41,17 +41,16 @@ class JointStatePublisher():
         rate = rospy.get_param('~rate', 20)
         r = rospy.Rate(rate)
         
-        dynamixels = rospy.get_param('dynamixels', '')
+        namespace = rospy.get_namespace()
         
-        self.joints = list()
-                                                
+        self.joints = rospy.get_param(namespace + '/joints', '')
+                                                                
         self.servos = list()
         self.controllers = list()
         self.joint_states = dict({})
         
-        for joint in sorted(dynamixels):
-            controller = joint.replace("_joint", "") + "_controller"
-            self.joint_states[joint] = JointStateMessage(joint, 0.0, 0.0, 0.0)
+        for controller in sorted(self.joints):
+            self.joint_states[controller] = JointStateMessage(controller, 0.0, 0.0, 0.0)
             self.controllers.append(controller)
                            
         # Start controller state subscribers
@@ -85,6 +84,7 @@ class JointStatePublisher():
             msg.effort.append(joint.effort)
            
         msg.header.stamp = rospy.Time.now()
+        msg.header.frame_id = 'base_link'
         self.joint_states_pub.publish(msg)
         
 if __name__ == '__main__':
