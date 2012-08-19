@@ -135,7 +135,7 @@ class OutAndBack():
                 # Get the current rotation
                 (position, rotation) = self.get_odom()
                 
-                # Compute the amount of rotation since the last lopp
+                # Compute the amount of rotation since the last loop
                 delta_angle = normalize_angle(rotation - last_angle)
                 
                 # Add to the running total

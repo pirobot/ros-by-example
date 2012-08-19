@@ -6,16 +6,6 @@ sync_read: True
 read_rate: 20
 write_rate: 20
 
-dynamixels: {
-    arm_shoulder_pan_joint: {id: 1, neutral: 512, max_speed: 100, min_angle: -145, max_angle: 145, invert: False},
-    arm_shoulder_lift_joint: {id: 2, neutral: 512, max_speed: 100, invert: True},
-    arm_elbow_flex_joint: {id: 3, neutral: 512, max_speed: 100, invert: True},
-    arm_wrist_flex_joint: {id: 4, neutral: 512, max_speed: 100, min_angle: -90, max_angle: 90, invert: True},
-    gripper_joint: {id: 5, neutral: 512, max_speed: 100, min_angle: -20, max_angle: 25, invert: False},
-    head_pan_joint: {id: 6, neutral: 512, max_speed: 100, min_angle: -145, max_angle: 145, invert: False},
-    head_tilt_joint: {id: 7, neutral: 512, max_speed: 100, min_angle: -90, max_angle: 90, invert: False}
-}
-
 joints: {
     arm_shoulder_pan_joint: {id: 1, neutral: 512, max_speed: 100, min_angle: -145, max_angle: 145, invert: False},
     arm_shoulder_lift_joint: {id: 2, neutral: 512, max_speed: 100, invert: True},
