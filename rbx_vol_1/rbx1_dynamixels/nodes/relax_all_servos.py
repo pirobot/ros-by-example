@@ -30,9 +30,11 @@ class Relax():
     def __init__(self):
         rospy.init_node('relax_all_servos')
         
-        # The joints parameter needs to be set by the servo controller
-        joints = rospy.get_param('~joints', '')
-        
+        namespace = rospy.get_namespace()
+
+        # The joints parameter needs to be set by the servo controller        
+        self.joints = rospy.get_param(namespace + '/joints', '')
+                
         default_dynamixel_speed = rospy.get_param('~default_dynamixel_speed', 0.5)
         default_dynamixel_torque = rospy.get_param('~default_dynamixel_torque', 0.5)
 
@@ -40,7 +42,7 @@ class Relax():
         torque_services = list()
         set_torque_limit_services = list()
             
-        for controller in sorted(joints):            
+        for controller in sorted(self.joints):            
             torque_service = '/' + controller + '/torque_enable'
             rospy.wait_for_service(torque_service)  
             torque_services.append(rospy.ServiceProxy(torque_service, TorqueEnable))

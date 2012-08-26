@@ -37,8 +37,10 @@ class HeadTracker():
         self.rate = rospy.get_param("~rate", 10)
         r = rospy.Rate(self.rate)
         
-        # The joints parameter needs to be set by the servo controller
-        self.joints = rospy.get_param('~joints', '')
+        namespace = rospy.get_namespace()
+
+        # The joints parameter needs to be set by the servo controller        
+        self.joints = rospy.get_param(namespace + '/joints', '')
         
         # What are the names of the pan and tilt joint in the list of dynamixels?
         self.head_pan_joint = 'head_pan_joint'
@@ -285,7 +287,7 @@ class HeadTracker():
         self.center_head_servos()
         
         # Relax all servos to give them a rest.
-        for servo in self.dynamixels:
+        for servo in self.joints:
             self.torque_enable[servo](False)
         
 def trunc(f, n):
