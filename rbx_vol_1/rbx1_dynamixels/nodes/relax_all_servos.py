@@ -30,9 +30,9 @@ class Relax():
     def __init__(self):
         rospy.init_node('relax_all_servos')
         
+        # The namespace and joints parameter needs to be set by the servo controller
+        # (The namespace is usually null.)
         namespace = rospy.get_namespace()
-
-        # The joints parameter needs to be set by the servo controller        
         self.joints = rospy.get_param(namespace + '/joints', '')
                 
         default_dynamixel_speed = rospy.get_param('~default_dynamixel_speed', 0.5)

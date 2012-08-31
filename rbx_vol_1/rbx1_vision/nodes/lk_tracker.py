@@ -146,8 +146,7 @@ class LKTracker(GoodFeatures):
                 track_box = cv.FitEllipse2(self.keypoints_matrix)
             else:
                 # Otherwise, find the best fitting rectangle
-                #track_box = cv2.boundingRect(self.keypoints_matrix)
-                track_box = None
+                track_box = cv2.boundingRect(self.keypoints_matrix)
         except:
             track_box = None
             

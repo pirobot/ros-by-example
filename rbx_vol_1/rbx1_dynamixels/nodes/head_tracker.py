@@ -37,9 +37,9 @@ class HeadTracker():
         self.rate = rospy.get_param("~rate", 10)
         r = rospy.Rate(self.rate)
         
+        # The namespace and joints parameter needs to be set by the servo controller
+        # (The namespace is usually null.)
         namespace = rospy.get_namespace()
-
-        # The joints parameter needs to be set by the servo controller        
         self.joints = rospy.get_param(namespace + '/joints', '')
         
         # What are the names of the pan and tilt joint in the list of dynamixels?

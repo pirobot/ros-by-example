@@ -91,6 +91,8 @@ class ROS2OpenCV2(object):
         cv.NamedWindow(self.cv_window_name, cv.CV_WINDOW_NORMAL)
         if self.resize_window_height > 0 and self.resize_window_width > 0:
             cv.ResizeWindow(self.cv_window_name, self.resize_window_width, self.resize_window_height)
+        else:
+            cv.ResizeWindow(self.cv_window_name, 640, 480)
         
         # Create the cv_bridge object
         self.bridge = CvBridge()
@@ -185,9 +187,9 @@ class ROS2OpenCV2(object):
                 (center, size, angle) = self.track_box
                 pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-                #cv.Rectangle(self.display_image, pt1, pt2, cv.RGB(255, 0, 0), 2, 8, 0)
                 if self.show_boxes:
-                    cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), self.feature_size)
+                    #cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), self.feature_size)
+                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(50, 255, 50), self.feature_size, 8, 0)
             except:
                 try:
                     x,y,w,h = self.track_box
