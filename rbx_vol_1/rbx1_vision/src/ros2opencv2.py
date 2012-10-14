@@ -85,6 +85,7 @@ class ROS2OpenCV2(object):
         self.busy = False
         self.resize_window_width = 0
         self.resize_window_height = 0
+        self.face_tracking = False
         
         # Create the main display window
         self.cv_window_name = self.node_name
@@ -181,32 +182,33 @@ class ROS2OpenCV2(object):
         self.display_image = cv2.bitwise_or(self.processed_image, self.marker_image)
 
         # If we have a track box, then display it.  The track box can be either a regular
-        # cvRect or a rotated Rect.
-        if self.track_box is not None and self.is_rect_nonzero(self.track_box):
-            try:
-                (center, size, angle) = self.track_box
-                pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
-                pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-                if self.show_boxes:
-                    #cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), self.feature_size)
-                    cv.Rectangle(cv.fromarray(self.display_image), pt1, pt2, cv.RGB(50, 255, 50), self.feature_size, 8, 0)
-
-            except:
-                try:
+        # cvRect (x,y,w,h) or a rotated Rect (center, size, angle).
+        if self.show_boxes:
+            if self.track_box is not None and self.is_rect_nonzero(self.track_box):
+                if len(self.track_box) == 4:
                     x,y,w,h = self.track_box
-                    size = w, h
-                    center = x + w / 2, y + h / 2
+                    size = (w, h)
+                    center = (x + w / 2, y + h / 2)
+                    angle = 0
+                    self.track_box = (center, size, angle)
+                else:
+                    (center, size, angle) = self.track_box   
+                    
+                # For face tracking, an upright rectangle looks best
+                if self.face_tracking:
                     pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                     pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                     cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(50, 255, 50), self.feature_size, 8, 0)
-                except:
-                    pass
+                else:
+                    # Otherwise, display a rotated rectangle
+                    vertices = np.int0(cv2.cv.BoxPoints(self.track_box))
+                    cv2.drawContours(self.display_image, [vertices], 0, cv.RGB(50, 255, 50), self.feature_size)
 
-        # Otherwise, if we have a detect box then display it
-        elif self.detect_box is not None and self.is_rect_nonzero(self.detect_box):
-            (pt1_x, pt1_y, w, h) = self.detect_box
-            if self.show_boxes:
-                cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), self.feature_size, 8, 0)
+            # If we don't yet have a track box, display the detect box if present
+            elif self.detect_box is not None and self.is_rect_nonzero(self.detect_box):
+                (pt1_x, pt1_y, w, h) = self.detect_box
+                if self.show_boxes:
+                    cv2.rectangle(self.display_image, (pt1_x, pt1_y), (pt1_x + w, pt1_y + h), cv.RGB(50, 255, 50), self.feature_size, 8, 0)
         
         # Publish the ROI
         self.publish_roi()

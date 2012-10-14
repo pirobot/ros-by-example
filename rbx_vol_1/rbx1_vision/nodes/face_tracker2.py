@@ -50,6 +50,7 @@ class FaceTracker(FaceDetector, LKTracker):
         self.drop_keypoints_interval = rospy.get_param("~drop_keypoints_interval", 1)
         self.expand_roi_init = rospy.get_param("~expand_roi", 1.02)
         self.expand_roi = self.expand_roi_init
+        self.face_tracking = True
 
         self.frame_index = 0
         self.add_index = 0

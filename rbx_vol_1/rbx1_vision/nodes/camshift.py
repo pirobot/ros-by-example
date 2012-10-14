@@ -110,7 +110,7 @@ class CamShiftNode(ROS2OpenCV2):
             
             # Run the CamShift algorithm
             self.track_box, self.track_window = cv2.CamShift(backproject, self.track_window, term_crit)
-            
+
             # Display the resulting backprojection
             cv2.imshow("Backproject", backproject)
 

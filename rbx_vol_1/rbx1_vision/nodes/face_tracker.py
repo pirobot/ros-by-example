@@ -37,6 +37,7 @@ class FaceTracker(FaceDetector, LKTracker):
         self.n_faces = rospy.get_param("~n_faces", 1)
         self.show_text = rospy.get_param("~show_text", True)
         self.feature_size = rospy.get_param("~feature_size", 1)
+        self.face_tracking = True
         
         self.keypoints = list()
         self.detect_box = None
