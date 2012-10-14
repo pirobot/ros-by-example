@@ -189,7 +189,8 @@ class ROS2OpenCV2(object):
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 if self.show_boxes:
                     #cv.EllipseBox(cv.fromarray(self.display_image), self.track_box, cv.CV_RGB(50, 255, 50), self.feature_size)
-                    cv2.rectangle(self.display_image, pt1, pt2, cv.RGB(50, 255, 50), self.feature_size, 8, 0)
+                    cv.Rectangle(cv.fromarray(self.display_image), pt1, pt2, cv.RGB(50, 255, 50), self.feature_size, 8, 0)
+
             except:
                 try:
                     x,y,w,h = self.track_box

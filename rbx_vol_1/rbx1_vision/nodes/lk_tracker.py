@@ -38,12 +38,10 @@ class LKTracker(GoodFeatures):
         self.lk_winSize = rospy.get_param("~lk_winSize", (10, 10))
         self.lk_maxLevel = rospy.get_param("~lk_maxLevel", 2)
         self.lk_criteria = rospy.get_param("~lk_criteria", (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 20, 0.01))
-        self.lk_derivLambda = rospy.get_param("~lk_derivLambda", 0.1)
         
         self.lk_params = dict( winSize  = self.lk_winSize, 
                   maxLevel = self.lk_maxLevel, 
-                  criteria = self.lk_criteria,
-                  derivLambda = self.lk_derivLambda )    
+                  criteria = self.lk_criteria)    
         
         self.detect_interval = 1
         self.keypoints = None
@@ -88,38 +86,34 @@ class LKTracker(GoodFeatures):
                 self.keypoints = None
                 self.track_box = None
                 self.detect_box = None
-                self.classifier_initialized = True
                 
         self.prev_grey = self.grey
                 
         return cv_image               
                     
     def track_keypoints(self, grey, prev_grey):
+        # We are tracking points between the previous frame and the
+        # current frame
+        img0, img1 = prev_grey, grey
+        
+        # Reshape the current keypoints into a numpy array required
+        # by calcOpticalFlowPyrLK()
+        p0 = np.float32([p for p in self.keypoints]).reshape(-1, 1, 2)
+        
+        # Calculate the optical flow from the previous frame to the current frame
+        p1, st, err = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **self.lk_params)
+        
+        # Do the reverse calculation: from the current frame to the previous frame
         try:
-            # We are tracking points between the previous frame and the
-            # current frame
-            img0, img1 = prev_grey, grey
-            
-            # Reshape the current keypoints into a numpy array required
-            # by calcOpticalFlowPyrLK()
-            p0 = np.float32([p for p in self.keypoints]).reshape(-1, 1, 2)
-            
-            # Calculate the optical flow from the previous frame
-            # to the current frame
-            p1, st, err = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **self.lk_params)
-            
-            # Do the reverse calculation: from the current frame
-            # to the previous frame
             p0r, st, err = cv2.calcOpticalFlowPyrLK(img1, img0, p1, None, **self.lk_params)
             
-            # Compute the distance between corresponding points
-            # in the two flows
+            # Compute the distance between corresponding points in the two flows
             d = abs(p0-p0r).reshape(-1, 2).max(-1)
             
             # If the distance between pairs of points is < 1 pixel, set
             # a value in the "good" array to True, otherwise False
             good = d < 1
-            
+        
             # Initialize a list to hold new keypoints
             new_keypoints = list()
             
@@ -135,7 +129,7 @@ class LKTracker(GoodFeatures):
             
             # Set the global keypoint list to the new list    
             self.keypoints = new_keypoints
-                
+            
             # If we have enough points, find the best fit ellipse around them
             if len(self.keypoints) > 6:
                 self.keypoints_matrix = cv.CreateMat(1, len(self.keypoints), cv.CV_32SC2)
@@ -149,9 +143,8 @@ class LKTracker(GoodFeatures):
                 track_box = cv2.boundingRect(self.keypoints_matrix)
         except:
             track_box = None
-            
+                        
         return track_box
-        
     
 if __name__ == '__main__':
     try:

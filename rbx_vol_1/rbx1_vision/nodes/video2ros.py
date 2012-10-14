@@ -2,7 +2,7 @@
 
 """ video2ros.py - Version 0.1 2012-05-31
 
-    Read in recorded video file and republish as a ROS Image topic.
+    Read in a recorded video file and republish as a ROS Image topic.
     
     Created for the Pi Robot Project: http://www.pirobot.org
     Copyright (c) 2012 Patrick Goebel.  All rights reserved.
@@ -35,7 +35,7 @@ class Video2ROS:
         
         rospy.on_shutdown(self.cleanup)
         
-        """ Define the input (path to video file) as ROS parameters so it
+        """ Define the input (path to video file) as a ROS parameter so it
             can be defined in a launch file or on the command line """
         self.input = rospy.get_param("~input", "")
         
