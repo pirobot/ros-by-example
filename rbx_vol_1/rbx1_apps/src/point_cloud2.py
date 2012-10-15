@@ -7,6 +7,7 @@ Author: Tim Field
 """
 
 import roslib; roslib.load_manifest('sensor_msgs')
+import roslib.message
 
 import ctypes
 import math

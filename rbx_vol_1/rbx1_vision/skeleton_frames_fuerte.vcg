@@ -1,0 +1,70 @@
+Background\ ColorB=0.101961
+Background\ ColorG=0.101961
+Background\ ColorR=0.101961
+Camera\ Config=0.1754 2.7854 2.16463 0.0897323 0.255461 -0.0479681
+Camera\ Type=rviz::OrbitViewController
+Fixed\ Frame=/skeleton/openni_depth_frame
+Grid.Alpha=0.5
+Grid.Cell\ Size=0.2
+Grid.ColorB=0.5
+Grid.ColorG=0.5
+Grid.ColorR=0.5
+Grid.Enabled=1
+Grid.Line\ Style=0
+Grid.Line\ Width=0.03
+Grid.Normal\ Cell\ Count=0
+Grid.OffsetX=0
+Grid.OffsetY=0
+Grid.OffsetZ=0
+Grid.Plane=0
+Grid.Plane\ Cell\ Count=40
+Grid.Reference\ Frame=<Fixed Frame>
+Markers.Enabled=0
+Markers.Marker\ Topic=/skeleton_markers
+Markers.Queue\ Size=100
+Property\ Grid\ Splitter=397,78
+Property\ Grid\ State=expanded=.Global Options,TF.Enabled;splitterratio=0.501873
+QMainWindow=000000ff00000000fd0000000300000000000001340000022dfc0200000001fb000000100044006900730070006c006100790073010000001d0000022d000000ee00ffffff000000010000013000000195fc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073000000001d000000670000006700fffffffb0000000a00560069006500770073000000001d00000101000000bb00fffffffb0000001200530065006c0065006300740069006f006e000000001d000001950000006700ffffff00000003000003ee0000003efc0100000001fb0000000800540069006d00650100000000000003ee000002bf00ffffff000002b40000022d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+TF.All\ Enabled=0
+TF.Enabled=1
+TF.Frame\ Timeout=15
+TF.Marker\ Scale=1
+TF.Show\ Arrows=0
+TF.Show\ Axes=1
+TF.Show\ Names=0
+TF.Update\ Interval=0
+Target\ Frame=<Fixed Frame>
+Tool\ 2D\ Nav\ GoalTopic=move_base_simple/goal
+Tool\ 2D\ Pose\ EstimateTopic=initialpose
+[Display0]
+ClassName=rviz::GridDisplay
+Name=Grid
+[Display1]
+ClassName=rviz::TFDisplay
+Name=TF
+[Display2]
+ClassName=rviz::MarkerDisplay
+Name=Markers
+[TF.Frames.]
+[TF.Frames./skeleton]
+head_2.Enabled=1
+left_elbow_2.Enabled=1
+left_foot_2.Enabled=1
+left_hand_2.Enabled=1
+left_hip_2.Enabled=1
+left_knee_2.Enabled=1
+left_shoulder_2.Enabled=1
+neck_2.Enabled=0
+openni_depth_frame.Enabled=0
+right_elbow_2.Enabled=1
+right_foot_2.Enabled=1
+right_hand_2.Enabled=1
+right_hip_2.Enabled=1
+right_knee_2.Enabled=1
+right_shoulder_2.Enabled=1
+torso_2.Enabled=1
+[Window]
+Height=691
+Width=1022
+X=-8
+Y=-29
