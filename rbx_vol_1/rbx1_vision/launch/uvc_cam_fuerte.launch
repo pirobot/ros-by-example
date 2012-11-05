@@ -8,6 +8,7 @@
         <param name="height" type="int" value="240" />
         <param name="fps" type="int" value="20" />
         <param name="frame" type="string" value="mono" />
+        <param name="auto" value="1" />
         <param name="exposure" value="0" />
         <param name="gain" value="100" />  
     </node>
