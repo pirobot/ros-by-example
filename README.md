@@ -1,4 +1,6 @@
-**PLEASE NOTE: This code depreciated.**
+<img align="left" src="http://www.pirobot.org/images/rbx_thumbnail.png">
+
+**PLEASE NOTE: This code is depreciated.**
 
 Please use the new code for ROS Groovy and later found in our [Github repository](https://github.com/pirobot/rbx1).
 
