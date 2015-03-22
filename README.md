@@ -1,4 +1,4 @@
-<img align="left" src="http://www.pirobot.org/images/rbx_thumbnail.png">
+<img align="left" src="http://www.pirobot.org/images/rbx_thumbnail.png" hspace="10px">
 
 **PLEASE NOTE: This code is depreciated.**
 
