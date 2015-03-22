@@ -1,0 +1,31 @@
+## ROS By Example - Hydro to Indigo PDF Conversion ##
+
+**Please Note:** These instructions have only been tested under Ubuntu 14.04 (Trusty)
+
+  * Install the binary diff package `bsdiff` under Ubuntu:
+
+> `$ sudo apt-get install bsdiff`
+
+  * Move into the directory containing your ROS By Example PDF for Hydro:
+
+> `$ cd directory_containing_original_pdf`
+
+  * Download the hydro2indigo.diff file:
+
+> `$ wget http://www.pirobot.org/downloads/hydro2indigo.diff`
+
+  * Use the `bspatch` utility (part of the `bsdiff` package) to apply the diff to the Hydro version of the PDF.  Change the source file name if you have renamed the original PDF and change the target file name if desired. (It can be anything you want but you should keep the .pdf extension.)
+
+For example:
+
+> `$ bspatch ros_by_example___volume_1.pdf ros_by_example___volume_1_indigo.pdf hydro2indigo.diff`
+
+> The general syntax is:
+
+> `$ bspatch source_file output_file diff_file`
+
+  * Bring up the new Indigo-specific PDF in your favorite PDF reader.
+
+  * Finally, don't forget to get the new Indigo-specific ROS By Example sample code from Github as explained in Chapter 5:
+
+**NOTE:** For future updates about the ROS By Example book and code, please join the [ros-by-example Google Group](https://groups.google.com/forum/#%21forum/ros-by-example)
