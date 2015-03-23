@@ -12,7 +12,7 @@
 
   * Download the groovy2hydro.diff file:
 
-> `$ wget http://ros-by-example.googlecode.com/files/groovy2hydro.diff`
+> `$ wget http://www.pirobot.org/downloads/groovy2hydro.diff`
 
   * Use the `bspatch` utility (part of the `bsdiff` package) to apply the diff to the Grpovy version of the PDF.  Change the source file name if you have renamed the original PDF and change the target file name if desired. (It can be anything you want but you should keep the .pdf extension.)
 
