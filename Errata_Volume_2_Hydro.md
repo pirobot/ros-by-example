@@ -1,3 +1,5 @@
+# Errata for Volume 2 ROS Hydro #
+
 The following errata are for book versions **1.0 - 1.02**.  They will be fixed in version 1.03.
 
   * In Section **6.4** page 181, the laptop\_battery.launch file is incorrectly described as including a rate parameter.  The rate is actually fixed in the laptop\_battery.py script so the rate parameter has been removed from the launch file and the text updated accordingly.
