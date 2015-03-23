@@ -16,11 +16,11 @@ To try the first diff file:
 
   * Download the `fuerte2groovy.diff` file:
 
-> `$ wget http://ros-by-example.googlecode.com/files/fuerte2groovy.diff`
+> `$ wget http://www.pirobot.org/downloads/fuerte2groovy.diff`
 
 If this does not work when following the instructions below, then try the second diff file:
 
-> `$ wget http://ros-by-example.googlecode.com/files/fuerte2groovy_2.diff`
+> `$ wget http://www.pirobot.org/downloads/fuerte2groovy_2.diff`
 
 
   * Use the `bspatch` utility (part of the `bsdiff` package) to apply the diff to the Fuerte version of the PDF.  Change the source file name if you have renamed the original PDF and change the target file name if desired. (It can be anything you want but you should keep the .pdf extension.)
