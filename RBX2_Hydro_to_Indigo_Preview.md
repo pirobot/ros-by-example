@@ -8,15 +8,23 @@
 
 > `$ cd directory_containing_original_pdf`
 
-  * Download the rbx2-hydro-to-indigo-preview.diff file:
+  * Download the diff file appropriate for the version of your Hydro PDF.  You can find the version number on the inside title page and it should be either 1.01 or 1.02.  For version 1.01, use the command
 
-> `$ wget http://www.pirobot.org/ros/rbx/rbx2-hydro-to-indigo-preview.diff`
+> `$ wget http://www.pirobot.org/ros/rbx/rbx2-hydro-1.01-to-indigo-preview.diff`
 
-  * Use the `bspatch` utility (part of the `bsdiff` package) as shown below to apply the diff to your original PDF. Change the source file name (the first filename below) to match the filename of your original PDF and change the target file name (the second filename below) if desired. (It can be anything you want but you should keep the .pdf extension.)
+For version 1.02, use the command
 
-For example:
+> `$ wget http://www.pirobot.org/ros/rbx/rbx2-hydro-1.02-to-indigo-preview.diff`
 
-> `$ bspatch ros_by_example___volume_2.pdf rbx2_vol_2_indigo_preview.pdf rbx2-hydro-to-indigo-preview.diff`
+  * Use the `bspatch` utility (part of the `bsdiff` package) as shown below to apply the diff to your original PDF. Change the source file name (the first filename below) to match the filename of your original PDF and change the output file name (the second filename below) if desired. (It can be anything you want but you should keep the .pdf extension.)
+
+For version 1.01 of the Hydro PDF, use:
+
+> `$ bspatch ros_by_example___volume_2.pdf rbx2_vol_2_indigo_preview.pdf rbx2-hydro-1.01-to-indigo-preview.diff`
+
+For version 1.02 of the Hydro PDF, use:
+
+> `$ bspatch ros_by_example___volume_2.pdf rbx2_vol_2_indigo_preview.pdf rbx2-hydro-1.02-to-indigo-preview.diff`
 
 > The general syntax is:
 
