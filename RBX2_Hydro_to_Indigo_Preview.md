@@ -20,11 +20,11 @@ For version 1.02, use the command
 
 For version 1.01 of the Hydro PDF, use:
 
-> `$ bspatch ros_by_example___volume_2.pdf rbx2_vol_2_indigo_preview.pdf rbx2-hydro-1.01-to-indigo-preview.diff`
+> `$ bspatch ros_by_example_volume_2___hydro_1.01.pdf rbx2_vol_2_indigo_preview.pdf rbx2-hydro-1.01-to-indigo-preview.diff`
 
 For version 1.02 of the Hydro PDF, use:
 
-> `$ bspatch ros_by_example___volume_2.pdf rbx2_vol_2_indigo_preview.pdf rbx2-hydro-1.02-to-indigo-preview.diff`
+> `$ bspatch ros_by_example_volume_2___hydro_1.02.pdf rbx2_vol_2_indigo_preview.pdf rbx2-hydro-1.02-to-indigo-preview.diff`
 
 > The general syntax is:
 
