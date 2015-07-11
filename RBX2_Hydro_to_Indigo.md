@@ -1,4 +1,4 @@
-## ROS By Example Volume 2 Hydro to Indigo PREVIEW conversion ##
+## ROS By Example Volume 2 Hydro to Indigo conversion ##
 
   * Install the binary diff package `bsdiff` under Ubuntu:
 
