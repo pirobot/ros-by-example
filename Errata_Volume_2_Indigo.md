@@ -4,7 +4,7 @@ The following errata are for book version **1.1.1**.
 
    * In section **3.4: A Patrol Bot Example**, the bullet point that reads:
 
-   `**Sensors and actuators:** ros-indigo-fake-localization
+   **Sensors and actuators:** ros-indigo-fake-localization
 
    should simply be:
 
