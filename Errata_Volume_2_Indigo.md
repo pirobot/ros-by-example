@@ -2,7 +2,7 @@
 
 The following errata are for book version **1.1.1**.
 
-   * In section **3.4: A Patrol Bot Example**, the bullet point that reads:
+   * In Section **3.4: A Patrol Bot Example**, the bullet point that reads:
 
    **Sensors and actuators:** ros-indigo-fake-localization
 
@@ -17,4 +17,17 @@ The following errata are for book version **1.1.1**.
    should read:
 
    A Sequence runs each child task in list order until one **fails** or until it runs out of subtasks.
- 
+
+   * In Section **3.10.7 Adding and removing tasks**, inside the code block the task named COUNT\_WORDS should be COUNT\_TO\_10.  In other words, the lines that read:
+
+    if remove:
+        PARALLEL_DEMO.remove_child(COUNT_WORDS)
+    else:
+        PARALLEL_DEMO.add_child(COUNT_WORDS)
+
+   should be:
+
+    if remove:
+        PARALLEL_DEMO.remove_child(COUNT_TO_10)
+    else:
+        PARALLEL_DEMO.add_child(COUNT_TO_10)
