@@ -8,8 +8,7 @@
 
 import roslib; roslib.load_manifest('rbx1_vision')
 import rospy
-import cv2
-from cv2 import cv as cv
+import cv2 as cv2
 from ros2opencv2 import ROS2OpenCV2
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
@@ -17,7 +16,6 @@ import numpy as np
 
 class CamShiftNode(ROS2OpenCV2):
     def __init__(self, node_name):
-        ROS2OpenCV2.__init__(self, node_name)
 
         self.node_name = node_name
         
@@ -29,25 +27,12 @@ class CamShiftNode(ROS2OpenCV2):
         self.vmax = rospy.get_param("~vmax", 254)
         self.threshold = rospy.get_param("~threshold", 50)
                        
-        # Create a number of windows for displaying the histogram,
-        # parameters controls, and backprojection image
-        cv.NamedWindow("Histogram", cv.CV_WINDOW_NORMAL)
-        cv.MoveWindow("Histogram", 700, 50)
-        cv.NamedWindow("Parameters", 0)
-        cv.MoveWindow("Parameters", 700, 325)
-        cv.NamedWindow("Backproject", 0)
-        cv.MoveWindow("Backproject", 700, 600)
-        
-        # Create the slider controls for saturation, value and threshold
-        cv.CreateTrackbar("Saturation", "Parameters", self.smin, 255, self.set_smin)
-        cv.CreateTrackbar("Min Value", "Parameters", self.vmin, 255, self.set_vmin)
-        cv.CreateTrackbar("Max Value", "Parameters", self.vmax, 255, self.set_vmax)
-        cv.CreateTrackbar("Threshold", "Parameters", self.threshold, 255, self.set_threshold)
-        
         # Initialize a number of variables
         self.hist = None
         self.track_window = None
         self.show_backproj = False
+        ROS2OpenCV2.__init__(self, node_name)
+	print("Init done...")
     
     # These are the callbacks for the slider controls
     def set_smin(self, pos):
@@ -64,6 +49,26 @@ class CamShiftNode(ROS2OpenCV2):
 
     # The main processing function computes the histogram and backprojection
     def process_image(self, cv_image):
+	print("Processing...")
+
+	# Moving these namedWindow() calls in the callback because of this bug:
+	# http://answers.opencv.org/question/160607/imshow-call-never-returns-opencv-320-dev/
+
+        # Create a number of windows for displaying the histogram,
+        # parameters controls, and backprojection image
+        cv2.namedWindow("Histogram", cv2.WINDOW_NORMAL)
+        cv2.moveWindow("Histogram", 700, 50)
+        cv2.namedWindow("Parameters", 0)
+        cv2.moveWindow("Parameters", 700, 325)
+        cv2.namedWindow("Backproject", 0)
+        cv2.moveWindow("Backproject", 700, 600)
+        
+        # Create the slider controls for saturation, value and threshold
+        cv2.createTrackbar("Saturation", "Parameters", self.smin, 255, self.set_smin)
+        cv2.createTrackbar("Min Value", "Parameters", self.vmin, 255, self.set_vmin)
+        cv2.createTrackbar("Max Value", "Parameters", self.vmax, 255, self.set_vmax)
+        cv2.createTrackbar("Threshold", "Parameters", self.threshold, 255, self.set_threshold)
+        
         # First blue the image
         frame = cv2.blur(cv_image, (5, 5))
         
@@ -99,7 +104,7 @@ class CamShiftNode(ROS2OpenCV2):
             backproject &= mask
 
             # Threshold the backprojection
-            ret, backproject = cv2.threshold(backproject, self.threshold, 255, cv.CV_THRESH_TOZERO)
+            ret, backproject = cv2.threshold(backproject, self.threshold, 255, cv2.THRESH_TOZERO)
 
             x, y, w, h = self.track_window
             if self.track_window is None or w <= 0 or h <=0:
