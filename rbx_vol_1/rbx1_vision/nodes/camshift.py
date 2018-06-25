@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=UTF-8
 
 """ camshift_node.py - Version 1.0 2011-04-19
 
